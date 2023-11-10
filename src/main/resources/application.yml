@@ -1,22 +1,8 @@
 spring:
-  on-profiles:
+  profiles:
+    group:
+      local: "local, server, jwt, oauth, springdoc"
     active: local
-
-server:
-  servlet:
-    context-path: /api
-
-logging:
-  level:
-    b172.challenging: debug
-
-jwt:
-  secret: "sdaspdjaskdjsaknfoasofnqwownfqfjoqwfnouwqnvownquvnqiwunvqviwqnowvniqwvuqwnivnqiwnvuiqwnviqwnvqwuinvuqiwnvwqiuvwnwuqivquiwdxn"
-  expiration: 3600000
-
----
-spring:
-  on-profiles: local
   jpa:
     show-sql: true
     database-platform: org.hibernate.dialect.H2Dialect
@@ -39,6 +25,33 @@ spring:
     init:
       enabled: true
 
+server:
+  port: 8080
+#  servlet:
+#    context-path: /api
+
+#logging:
+#  level:
+#    b172.challenging: debug
+
+---
+spring:
+  profiles:
+    include: jwt
+jwt:
+  secretKey: "sdaspdjaskdjsaknfoasofnqwownfqfjoqwfnouwqnvownquvnqiwunvqviwqnowvniqwvuqwnivnqiwnvuiqwnviqwnvqwuinvuqiwnvwqiuvwnwuqivquiwdxn"
+  access:
+    expiration: 3600
+    header: "Authorization"
+  refresh:
+    expiration: 2592000
+    header: "RefreshToken"
+
+---
+spring:
+  profiles:
+    include: springdoc
+
 springdoc:
   default-consumes-media-type: application/json;charset=UTF-8
   default-produces-media-type: application/json;charset=UTF-8
@@ -54,3 +67,20 @@ springdoc:
       enabled: true
   cache:
     disabled: true
+
+---
+spring:
+  profiles:
+    include: oauth
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id:
+            client-secret:
+            redirectUri: "{baseUrl}/oauth2/callback/{registrationId}"
+            scope:
+              - email
+              - profile
+
