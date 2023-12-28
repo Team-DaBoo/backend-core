@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -22,6 +23,8 @@ public class QMember extends EntityPathBase<Member> {
     public final NumberPath<Long> birthYear = createNumber("birthYear", Long.class);
 
     public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+
+    public final ListPath<b172.challenging.gathering.domain.GatheringMember, b172.challenging.gathering.domain.QGatheringMember> gatheringMembers = this.<b172.challenging.gathering.domain.GatheringMember, b172.challenging.gathering.domain.QGatheringMember>createList("gatheringMembers", b172.challenging.gathering.domain.GatheringMember.class, b172.challenging.gathering.domain.QGatheringMember.class, PathInits.DIRECT2);
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 

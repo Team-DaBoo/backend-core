@@ -5,7 +5,8 @@ import b172.challenging.auth.repository.MemberRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.ErrorCode;
 import b172.challenging.gathering.domain.*;
-import b172.challenging.gathering.dto.*;
+import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
+import b172.challenging.gathering.dto.response.*;
 import b172.challenging.gathering.repository.GatheringMemberRepository;
 import b172.challenging.gathering.repository.GatheringRepository;
 import lombok.RequiredArgsConstructor;
@@ -159,6 +160,21 @@ public class GatheringService {
 
         return LeftGatheringResponseDto.builder()
                 .gatheringMember(gatheringMember)
+                .build();
+    }
+
+    public GatheringStatusCountResponseDto gatheringStatusCount(Long memberId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() ->  new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
+
+        Long onGoingCount = gatheringMemberRepository.countByMemberIdAndStatus(memberId, GatheringMemberStatus.ONGOING);
+        Long completedCount = gatheringMemberRepository.countByMemberIdAndStatus(memberId, GatheringMemberStatus.COMPLETED);
+        Long ownerGatheringCount = gatheringRepository.countByOwnerMember(member);
+
+        return GatheringStatusCountResponseDto.builder()
+                .onGoingCount(onGoingCount)
+                .completedCount(completedCount)
+                .ownerGatheringCount(ownerGatheringCount)
                 .build();
     }
 }
