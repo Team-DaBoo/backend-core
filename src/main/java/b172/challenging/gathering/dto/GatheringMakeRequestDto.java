@@ -1,4 +1,4 @@
-package b172.challenging.gathering.dto.request;
+package b172.challenging.gathering.dto;
 
 import b172.challenging.gathering.domain.AppTechPlatform;
 import com.fasterxml.jackson.annotation.JsonFormat;

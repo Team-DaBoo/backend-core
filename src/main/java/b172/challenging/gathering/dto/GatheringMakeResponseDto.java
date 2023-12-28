@@ -1,4 +1,4 @@
-package b172.challenging.gathering.dto.response;
+package b172.challenging.gathering.dto;
 
 import b172.challenging.auth.domain.Member;
 import lombok.Builder;

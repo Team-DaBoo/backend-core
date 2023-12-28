@@ -1,7 +1,9 @@
-package b172.challenging.gathering.dto.response;
+package b172.challenging.gathering.dto;
 
+import b172.challenging.auth.domain.Member;
 import b172.challenging.gathering.domain.AppTechPlatform;
 import b172.challenging.gathering.domain.Gathering;
+import b172.challenging.gathering.domain.GatheringStatus;
 import lombok.Builder;
 
 import java.util.List;
@@ -16,8 +18,4 @@ public record GatheringPageResponseDto(
         boolean last
         ) {
 
-        @Builder
-        public static record AppTechPlatformDto(
-                AppTechPlatform[] appTechPlatform
-        ) { }
 }
