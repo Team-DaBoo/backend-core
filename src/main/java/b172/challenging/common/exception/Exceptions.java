@@ -1,8 +1,5 @@
 package b172.challenging.common.exception;
 
-
-import javax.swing.*;
-
 public enum Exceptions {
 
     INVALID_REQUEST(400, "1001", "올바르지 않은 요청입니다."),
