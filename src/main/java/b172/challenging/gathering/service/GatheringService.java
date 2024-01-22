@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -137,8 +136,8 @@ public class GatheringService {
     }
 
     public PendingGatheringResponseDto findPendingGathering(Long gatheringId, Long MemberId) {
-        Optional<Gathering> gatheringOptional = gatheringRepository.findById(gatheringId);
-        Gathering gathering = gatheringOptional.orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
 
         List<GatheringMember> gatheringMemberList = gatheringMemberRepository.findByGatheringAndStatus(gathering, GatheringMemberStatus.ONGOING);
 
@@ -160,9 +159,8 @@ public class GatheringService {
     }
 
     public OngoingGatheringResponseDto findOngoingGathering(Long gatheringId) {
-
-        Optional<Gathering> gatheringOptional = gatheringRepository.findById(gatheringId);
-        Gathering gathering = gatheringOptional.orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
 
         List<GatheringMember> gatheringMemberList = gatheringMemberRepository.findByGatheringAndStatus(gathering, GatheringMemberStatus.ONGOING);
 
@@ -180,9 +178,11 @@ public class GatheringService {
                 .build();
     }
 
-    public JoinGatheringResponseDto joinGathering(Long MemberId, Long gatheringId) {
-        Member member = new Member(MemberId);
-        Gathering gathering = new Gathering(gatheringId);
+    public JoinGatheringResponseDto joinGathering(Long memberId, Long gatheringId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
         GatheringMember gatheringMember = GatheringMember.builder()
                 .member(member)
                 .gathering(gathering)
@@ -199,11 +199,10 @@ public class GatheringService {
 
     @Transactional
     public LeftGatheringResponseDto leftGathering(Long MemberId, Long gatheringMemberId) {
-        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING_MEMBER));
 
         gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
-
-        gatheringMemberRepository.save(gatheringMember);
 
         return LeftGatheringResponseDto.builder()
                 .gatheringMember(gatheringMember)
@@ -217,7 +216,7 @@ public class GatheringService {
         if (totalSaving != null && totalWorkingDays != null && totalWorkingDays != 0) {
             return (double) totalSaving / totalWorkingDays * 100;
         }
-        return (double) 0.0;
+        return 0.0;
     }
 
     public GatheringStatisticsResponseDto gatheringStatistics(Long memberId) {

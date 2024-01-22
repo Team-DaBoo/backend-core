@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,8 +20,8 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final MaterialWalletRepository materialWalletRepository;
 
-    public WalletResponseDto findMyWallet (Long id){
-        Optional<Wallet> optionalWallet = walletRepository.findByMemberId(id);
+    public WalletResponseDto findMyWallet (Long memberId){
+        Optional<Wallet> optionalWallet = walletRepository.findByMemberId(memberId);
 
         return optionalWallet.map( wallet -> WalletResponseDto.builder()
                 .id(wallet.getId())
@@ -33,13 +32,13 @@ public class WalletService {
                 .saveAmount(wallet.getSaveAmount())
                 .homeUpdatedAt(wallet.getHomeUpdatedAt())
                 .build())
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
     }
 
-    public MaterialWalletResponseDto findMyMaterialWallet (Long id){
-        List<MaterialWallet> materialWalletList = materialWalletRepository.findByMemberId(id);
+    public MaterialWalletResponseDto findMyMaterialWallet (Long memberId){
+        List<MaterialWallet> materialWalletList = materialWalletRepository.findByMemberId(memberId);
         if(materialWalletList.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET);
         }
 
         return MaterialWalletResponseDto

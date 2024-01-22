@@ -9,14 +9,12 @@ import b172.challenging.auth.service.JwtService;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springdoc.api.ErrorMessage;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -28,7 +26,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -54,7 +51,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String refreshToken = jwtService.extractRefreshToken(request)
                     .filter(jwtService::verifyToken)
                     .orElse(null);
-            /**
+            /*
              * refresh token 전송시 access, refresh token 모두 재발급
              */
             if (refreshToken != null) {
@@ -99,7 +96,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String tokenJwtCode = jwtService.extractJwtCode(refreshToken);
         if (!tokenJwtCode.equals(storedJwtCode)) {
-            new CustomRuntimeException(Exceptions.UNAUTHORIZED);
+            throw new CustomRuntimeException(Exceptions.UNAUTHORIZED);
         }
         jwtService.sendAccessAndRefreshToken(
                 response, jwtService.createAccessToken(memberId, member.getRole()), jwtService.createRefreshToken(memberId)
