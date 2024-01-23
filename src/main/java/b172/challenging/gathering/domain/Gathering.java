@@ -1,6 +1,7 @@
 package b172.challenging.gathering.domain;
 
 import b172.challenging.member.domain.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -26,7 +27,6 @@ public class Gathering {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_member_id", nullable = false)
-//    @JsonIgnore
     @Schema(description = "모임 개설자 Id")
     private Member ownerMember;
 
@@ -35,10 +35,10 @@ public class Gathering {
     @Schema(description = "앱 플랫폼")
     private AppTechPlatform platform;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "gathering_image_id")
-    @Schema(description = "모임 이미지 Id")
-    private GatheringImage gatheringImage;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "gathering_image_id")
+//    @Schema(description = "모임 이미지 Id")
+    private String gatheringImageUrl;
 
     @Column(nullable = false)
     @Schema(description = "모임 제목")
@@ -74,6 +74,7 @@ public class Gathering {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "gathering", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
     private List<GatheringMember> gatheringMembers;
 
@@ -93,9 +94,5 @@ public class Gathering {
     public void addGatheringMember(GatheringMember gatheringMember){
         gatheringMembers.add(gatheringMember);
         gatheringMember.setGathering(this);
-    }
-
-    public Gathering(Long id){
-        this.id = id;
     }
 }

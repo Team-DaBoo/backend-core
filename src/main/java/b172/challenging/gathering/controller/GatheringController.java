@@ -45,7 +45,7 @@ public class GatheringController {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
-    public ResponseEntity<GatheringMemberPageResponseDto> getInProgressMyGathering (Principal principal,
+    public ResponseEntity<GatheringPageResponseDto> getInProgressMyGathering (Principal principal,
                                                                                     @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page){
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(gatheringService.findMyGatheringInProgress(memberId ,page));
@@ -161,7 +161,7 @@ public class GatheringController {
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(gatheringSavingLogService.saveGatheringSavingLog(memberId, gatheringMemberId, gatheringSavingLogRequestDto));
     }
-    
+
     @PostMapping("/saving-log/{savingLogId}")
     @Operation(summary = "인증 수정 하기", description = "이전 인증을 수정 합니다.")
     @ApiResponses(value = {

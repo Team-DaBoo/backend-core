@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -30,7 +30,6 @@ public class GatheringService {
     private final GatheringRepository gatheringRepository;
     private final GatheringMemberRepository gatheringMemberRepository;
     private final GatheringMemberCustomRepository gatheringMemberCustomRepository;
-    private final GatheringImageRepository gatheringImageRepository;
     private final MemberRepository memberRepository;
 
     public GatheringPageResponseDto findGatheringByPlatform (AppTechPlatform platform, GatheringStatus status, Pageable page){
@@ -70,11 +69,17 @@ public class GatheringService {
                 .build();
     }
 
-    public GatheringMemberPageResponseDto findMyGatheringInProgress(Long MemberId, Pageable page) {
-        Page<GatheringMember> gatheringMembersPage = gatheringMemberRepository.findByMemberIdAndStatus(MemberId, GatheringMemberStatus.ONGOING, page);
+    public GatheringPageResponseDto findMyGatheringInProgress(Long memberId, Pageable page) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Page<GatheringMember> gatheringMembersPage = gatheringMemberRepository.findByMemberAndStatus(member, GatheringMemberStatus.ONGOING, page);
         List<GatheringMember> gatheringMembers  = new ArrayList<>(gatheringMembersPage.getContent());
-        return GatheringMemberPageResponseDto.builder()
-                .gatheringMembers(gatheringMembers)
+        List<Gathering> gatherings = gatheringRepository.findAllById(gatheringMembers.stream().map(gms -> gms.getMember().getId()).collect(Collectors.toList()));
+        if(gatherings.isEmpty()) {
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
+        }
+        return GatheringPageResponseDto.builder()
+                .gatherings(gatherings)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
                 .totalElements(gatheringMembersPage.getTotalElements())
@@ -83,28 +88,15 @@ public class GatheringService {
                 .build();
     }
 
-    private GatheringImage generateGatheringImage() {
-        List<GatheringImage> allImages = gatheringImageRepository.findAll();
-        if (allImages == null || allImages.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_IMAGE);
-        }
-
-        Random random = new Random();
-        int randomIndex = random.nextInt(allImages.size());
-
-        return allImages.get(randomIndex);
-    }
-
 
     @Transactional
     public GatheringMakeResponseDto makeGathering(Long memberId, GatheringMakeRequestDto gatheringMakeRequestDto) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        GatheringImage gatheringImage = generateGatheringImage();
         Gathering gathering = Gathering.builder()
-                 .ownerMember(member)
+                .ownerMember(member)
                 .platform(gatheringMakeRequestDto.appTechPlatform())
-                .gatheringImage(gatheringImage)
+                .gatheringImageUrl(gatheringMakeRequestDto.gatheringImageUrl())
                 .title(gatheringMakeRequestDto.title())
                 .description(gatheringMakeRequestDto.description())
                 .peopleNum(gatheringMakeRequestDto.peopleNum())
@@ -112,8 +104,8 @@ public class GatheringService {
                 .goalAmount(gatheringMakeRequestDto.goalAmount())
                 .status(GatheringStatus.PENDING)
                 .startDate(gatheringMakeRequestDto.startDate())
-                .gatheringMembers(new ArrayList<>())
                 .endDate(gatheringMakeRequestDto.endDate())
+                .gatheringMembers(new ArrayList<>())
                 .build();
 
         GatheringMember gatheringMember = GatheringMember.builder()
@@ -150,7 +142,7 @@ public class GatheringService {
                 .gatheringStatus(gathering.getStatus())
                 .remainNum(gathering.getPeopleNum() - gatheringMemberList.size())
                 .appTechPlatform(gathering.getPlatform())
-                .gatheringImage(GatheringImageResponseDto.of(gathering.getGatheringImage()).url())
+                .gatheringImage(gathering.getGatheringImageUrl())
                 .startDate(gathering.getStartDate())
                 .endDate(gathering.getEndDate())
                 .workingDays(gathering.getWorkingDays())
@@ -171,7 +163,7 @@ public class GatheringService {
                 .title(gathering.getTitle())
                 .description(gathering.getDescription())
                 .appTechPlatform(gathering.getPlatform())
-                .gatheringImage(GatheringImageResponseDto.of(gathering.getGatheringImage()).url())
+                .gatheringImage(gathering.getGatheringImageUrl())
                 .startDate(gathering.getStartDate())
                 .endDate(gathering.getEndDate())
                 .workingDays(gathering.getWorkingDays())
@@ -180,9 +172,11 @@ public class GatheringService {
                 .build();
     }
 
-    public JoinGatheringResponseDto joinGathering(Long MemberId, Long gatheringId) {
-        Member member = new Member(MemberId);
-        Gathering gathering = new Gathering(gatheringId);
+    public JoinGatheringResponseDto joinGathering(Long memberId, Long gatheringId) {
+        Member member = memberRepository.findById(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         GatheringMember gatheringMember = GatheringMember.builder()
                 .member(member)
                 .gathering(gathering)
