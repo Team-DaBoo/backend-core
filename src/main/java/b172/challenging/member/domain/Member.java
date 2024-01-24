@@ -5,7 +5,6 @@ import b172.challenging.gathering.domain.GatheringMember;
 import b172.challenging.wallet.domain.MaterialWallet;
 import b172.challenging.wallet.domain.Wallet;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,10 +19,6 @@ import java.util.List;
         @UniqueConstraint(columnNames = {"oauth_provider", "oauth_id"})
 })
 @NoArgsConstructor
-@JsonIgnoreProperties({
-                "oauthProvider", "oauthId", "jwtCode","birthYear", "sex",
-                "leaved", "createdAt", "updatedAt", "leavedAt"
-        })
 public class Member {
 
     @Id
@@ -67,20 +62,13 @@ public class Member {
     @Column(name = "leaved_at")
     private LocalDateTime leavedAt;
 
-    @JsonIgnore
-    @OneToOne(mappedBy = "member", cascade = CascadeType.ALL)
-    private Wallet wallet;
-
-    @JsonIgnore
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.REMOVE })
     private List<GatheringMember> gatheringMembers;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "ownerMember", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
+    @OneToMany(mappedBy = "ownerMember", cascade = { CascadeType.REMOVE })
     private List<Gathering> gathering;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.REMOVE  })
     private List<MaterialWallet> materialWallets;
 
     @PrePersist

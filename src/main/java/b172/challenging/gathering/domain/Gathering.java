@@ -25,7 +25,7 @@ public class Gathering {
     @Column(name = "gathering_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "owner_member_id", nullable = false)
     @Schema(description = "모임 개설자 Id")
     private Member ownerMember;
@@ -35,9 +35,6 @@ public class Gathering {
     @Schema(description = "앱 플랫폼")
     private AppTechPlatform platform;
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "gathering_image_id")
-//    @Schema(description = "모임 이미지 Id")
     private String gatheringImageUrl;
 
     @Column(nullable = false)
@@ -51,6 +48,10 @@ public class Gathering {
     @Schema(description = "모집 할 인원 수")
     private int peopleNum;
 
+    @Column(name = "participants_num", columnDefinition = "bigint default 0")
+    @Schema(description = "참여 중인 인원 수")
+    private int participantsNum;
+
     @Column(name = "goal_amount", nullable = false)
     @Schema(description = "목표 금액")
     private Long goalAmount;
@@ -63,19 +64,18 @@ public class Gathering {
     @Enumerated(EnumType.STRING)
     private GatheringStatus status;
 
-    @Column(name = "start_date", nullable = false)
+    @Column(name = "start_date")
     @Schema(description = "시작 일시")
     private LocalDateTime startDate;
 
-    @Column(name = "end_date", nullable = false)
+    @Column(name = "end_date")
     @Schema(description = "만료 일시")
     private LocalDateTime endDate;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "gathering", cascade = { CascadeType.PERSIST , CascadeType.MERGE })
+    @OneToMany(mappedBy = "gathering", cascade = { CascadeType.REMOVE})
     private List<GatheringMember> gatheringMembers;
 
     @Column(name = "updated_at")
@@ -94,5 +94,7 @@ public class Gathering {
     public void addGatheringMember(GatheringMember gatheringMember){
         gatheringMembers.add(gatheringMember);
         gatheringMember.setGathering(this);
+        this.participantsNum++;
+        if(participantsNum == peopleNum) this.status = GatheringStatus.ONGOING;
     }
 }

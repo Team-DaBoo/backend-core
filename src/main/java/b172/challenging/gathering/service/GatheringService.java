@@ -1,8 +1,8 @@
 package b172.challenging.gathering.service;
 
+import b172.challenging.gathering.dto.GatheringPageDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
 import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
-import b172.challenging.gathering.repository.GatheringImageRepository;
 import b172.challenging.gathering.repository.GatheringMemberCustomRepository;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.repository.MemberRepository;
@@ -21,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,12 +42,12 @@ public class GatheringService {
         List<Gathering> gatherings  = new ArrayList<>(gatheringsPage.getContent());
 
         return GatheringPageResponseDto.builder()
-                .gatherings(gatherings)
+//                .gatherings(gatherings)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
                 .totalElements(gatheringsPage.getTotalElements())
                 .totalPages(gatheringsPage.getTotalPages())
-                .last(gatheringsPage.isLast())
+                .lastPage(gatheringsPage.isLast())
                 .build();
     }
 
@@ -60,31 +60,54 @@ public class GatheringService {
 
 
         return GatheringPageResponseDto.builder()
-                .gatherings(gatherings)
+//                .gatherings(gatherings)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
                 .totalElements(gatheringsPage.getTotalElements())
                 .totalPages(gatheringsPage.getTotalPages())
-                .last(gatheringsPage.isLast())
+                .lastPage(gatheringsPage.isLast())
                 .build();
     }
 
-    public GatheringPageResponseDto findMyGatheringInProgress(Long memberId, Pageable page) {
+    public GatheringPageResponseDto findGathering(Long memberId, String who, GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        Page<GatheringMember> gatheringMembersPage = gatheringMemberRepository.findByMemberAndStatus(member, GatheringMemberStatus.ONGOING, page);
-        List<GatheringMember> gatheringMembers  = new ArrayList<>(gatheringMembersPage.getContent());
-        List<Gathering> gatherings = gatheringRepository.findAllById(gatheringMembers.stream().map(gms -> gms.getMember().getId()).collect(Collectors.toList()));
-        if(gatherings.isEmpty()) {
+        Page<Gathering> gatheringPage = null;
+        if(Objects.equals(who, "my")) {
+            gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
+                    ? gatheringRepository.findByGatheringMembersMemberAndStatus(member,GatheringStatus.PENDING, page)
+                    : gatheringRepository.findByGatheringMembersMemberAndStatusNot(member,GatheringStatus.PENDING, page);
+        } else if (Objects.equals(who, "other")) {
+            if(platform == null) {
+                gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
+                        ? gatheringRepository.findByGatheringMembersMemberNotAndStatus(member, GatheringStatus.PENDING, page)
+                        : gatheringRepository.findByGatheringMembersMemberNotAndStatusNot(member, GatheringStatus.PENDING, page);
+            } else {
+                gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
+                        ? gatheringRepository.findByGatheringMembersMemberNotAndPlatformAndStatus(member, platform, GatheringStatus.PENDING, page)
+                        : gatheringRepository.findByGatheringMembersMemberNotAndPlatformAndStatusNot(member, platform, GatheringStatus.PENDING, page);
+            }
+        } else {
+            throw new CustomRuntimeException(Exceptions.INVALID_REQUEST);
+        }
+
+
+//        Page<Gathering> gatheringPage = gatheringRepository.findByGatheringMembers_MemberIdAndStatus(memberId,GatheringStatus.PENDING, page);
+        List<Gathering> gatherings = new ArrayList<>(gatheringPage.getContent());
+
+        if (gatherings.isEmpty()) {
             throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
         }
+
+        List<GatheringPageDto> gatheringPageDto = gatherings.stream().map(GatheringPageDto::new).toList();
+
         return GatheringPageResponseDto.builder()
-                .gatherings(gatherings)
+                .gatheringPages(gatheringPageDto)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
-                .totalElements(gatheringMembersPage.getTotalElements())
-                .totalPages(gatheringMembersPage.getTotalPages())
-                .last(gatheringMembersPage.isLast())
+                .totalElements(gatheringPage.getTotalElements())
+                .totalPages(gatheringPage.getTotalPages())
+                .lastPage(gatheringPage.isLast())
                 .build();
     }
 
