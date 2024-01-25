@@ -7,15 +7,15 @@ import b172.challenging.member.dto.MemberDto;
 import lombok.Getter;
 
 @Getter
-public class GatheringPageDto {
-    private Long id;
-    private MemberDto ownerMember;
-    private AppTechPlatform platform;
-    private String gatheringImageUrl;
-    private String title;
-    private GatheringStatus gatheringStatus;
-    private int remainPeopleNum;
-    public GatheringPageDto(Gathering gathering){
+public class GatheringDto {
+    private final Long id;
+    private final MemberDto ownerMember;
+    private final AppTechPlatform platform;
+    private final String gatheringImageUrl;
+    private final String title;
+    private final GatheringStatus gatheringStatus;
+    private final int remainPeopleNum;
+    public GatheringDto(Gathering gathering){
         this.id = gathering.getId();
         this.ownerMember = new MemberDto(gathering.getOwnerMember());
         this.platform = gathering.getPlatform();

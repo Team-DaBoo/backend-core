@@ -4,20 +4,16 @@ import b172.challenging.gathering.domain.Gathering;
 import b172.challenging.gathering.domain.GatheringMember;
 import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.member.domain.Member;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
 import java.util.Optional;
 
 public interface GatheringMemberRepository extends JpaRepository<GatheringMember, Long> {
-
-    Page<GatheringMember> findByMemberAndStatus(Member member, GatheringMemberStatus status, Pageable pageable);
-
     List<GatheringMember> findByGatheringAndStatus(Gathering gathering, GatheringMemberStatus gatheringMemberStatus);
 
     Optional<GatheringMember> findByIdAndMemberId(Long gatheringMemberId, Long userId);
+    Optional<GatheringMember> findByMember(Member member);
 
     Long countByMemberIdAndStatus(Long memberId, GatheringMemberStatus gatheringMemberStatus);
 }

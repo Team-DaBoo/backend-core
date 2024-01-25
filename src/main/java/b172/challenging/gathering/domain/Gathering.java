@@ -93,7 +93,7 @@ public class Gathering {
     public void addGatheringMember(GatheringMember gatheringMember){
         gatheringMembers.add(gatheringMember);
         gatheringMember.setGathering(this);
-        this.participantsNum++;
+        ++this.participantsNum;
         if(participantsNum == peopleNum) this.status = GatheringStatus.ONGOING;
     }
 

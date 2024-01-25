@@ -1,6 +1,7 @@
 package b172.challenging.gathering.service;
 
-import b172.challenging.gathering.dto.GatheringPageDto;
+import b172.challenging.gathering.dto.GatheringDto;
+import b172.challenging.gathering.dto.GatheringMemberDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
 import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
 import b172.challenging.gathering.repository.GatheringMemberCustomRepository;
@@ -30,8 +31,8 @@ public class GatheringService {
     private final GatheringMemberCustomRepository gatheringMemberCustomRepository;
     private final MemberRepository memberRepository;
 
-    public GatheringPageResponseDto findGathering(Long memberId, GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
-        Page<Gathering> gatheringPage = null;
+    public GatheringPageResponseDto findGathering(GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
+        Page<Gathering> gatheringPage;
         if (platform == null) {
             gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
                     ? gatheringRepository.findByStatus(GatheringStatus.PENDING, page)
@@ -45,7 +46,7 @@ public class GatheringService {
     }
 
     public GatheringPageResponseDto findMyGathering(Long memberId, GatheringMemberStatus gatheringMemberStatus, String made, Pageable page) {
-        Page<Gathering> gatheringMyPage = null;
+        Page<Gathering> gatheringMyPage;
         if(made == null) {
             gatheringMyPage = gatheringMemberStatus.equals(GatheringMemberStatus.ONGOING)
                     ? gatheringRepository.findByGatheringMembersMember_IdAndGatheringMembersStatus(memberId,GatheringMemberStatus.ONGOING, page)
@@ -67,7 +68,7 @@ public class GatheringService {
             throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
         }
 
-        List<GatheringPageDto> gatheringPageDto = gatherings.stream().map(GatheringPageDto::new).toList();
+        List<GatheringDto> gatheringPageDto = gatherings.stream().map(GatheringDto::new).toList();
 
         return GatheringPageResponseDto.builder()
                 .gatheringPages(gatheringPageDto)
@@ -161,35 +162,36 @@ public class GatheringService {
     }
 
     @Transactional
-    public JoinGatheringResponseDto joinGathering(Long memberId, Long gatheringId) {
+    public GatheringMemberDto joinGathering(Long memberId, Long gatheringId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        GatheringMember gatheringMember = GatheringMember.builder()
-                .member(member)
-                .gathering(gathering)
-                .status(GatheringMemberStatus.ONGOING)
-                .amount(0L)
-                .count(0).build();
+        GatheringMember gatheringMember = gatheringMemberRepository.findByMember(member)
+                .orElse(GatheringMember.builder()
+                        .member(member)
+                        .gathering(gathering)
+                        .amount(0L)
+                        .count(0)
+                        .build()
+                );
+        gatheringMember.setStatus(GatheringMemberStatus.ONGOING);
         gathering.addGatheringMember(gatheringMember);
 
-        return JoinGatheringResponseDto.builder()
-                .gatheringMember(gatheringMember)
-                .build();
+        gatheringRepository.save(gathering);
+
+        return new GatheringMemberDto(gatheringMember);
     }
 
     @Transactional
-    public LeftGatheringResponseDto leftGathering(Long MemberId, Long gatheringMemberId) {
+    public GatheringMemberDto leftGathering(Long MemberId, Long gatheringMemberId) {
         GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         Gathering gathering = gatheringRepository.findById(gatheringMember.getId())
                         .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
         gathering.leftGatheringMember(gatheringMember);
 
-        return LeftGatheringResponseDto.builder()
-                .gatheringMember(gatheringMember)
-                .build();
+        return new GatheringMemberDto(gatheringMember);
     }
 
     public Double getAchievementRate(Member member) {
