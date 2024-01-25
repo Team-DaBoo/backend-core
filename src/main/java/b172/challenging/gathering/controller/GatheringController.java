@@ -2,6 +2,7 @@ package b172.challenging.gathering.controller;
 
 
 import b172.challenging.gathering.domain.AppTechPlatform;
+import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
 import b172.challenging.gathering.dto.response.GatheringSavingLogResponseDto;
@@ -39,34 +40,36 @@ public class GatheringController {
     private final GatheringService gatheringService;
     private final GatheringSavingLogService gatheringSavingLogService;
 
-//    @GetMapping("/{my}")
-//    @Operation(summary = "내 참가 현황 가져오기", description = "내가 참가하고 있는 모임을 가져옵니다.")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "200", description = "성공"),
-//            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-//    })
-//    public ResponseEntity<GatheringPageResponseDto> getInProgressMyGathering (Principal principal,
-//                                                                                    @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page){
-//        Long memberId = Long.parseLong(principal.getName());
-//        return ResponseEntity.ok(gatheringService.findMyGatheringInProgress(memberId ,page));
-//    }
-
-    @GetMapping(value = {"/{who}/{status}/{platform}", "/{who}/{status}"})
-    @Operation(summary = "PlatForm 에 따른 모임 가져오기", description = "AppPlatForm 가져옵니다.")
+    @GetMapping(value = {"/{status}/{platform}", "/{status}"})
+    @Operation(summary = "PlatForm 에 따른 전체 모임 가져오기", description = "AppPlatForm 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
-    @Parameter(name = "who" , description = "who : [my] or [other]")
     @Parameter(name = "status", description = "status : [PENDING] or [ONGOING, COMPLETED]", example = "TOSS")
     @Parameter(name = "platform", description = "platform : [TOSS, CASH_WORK, MONIMO, BALSO]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable String who,
-                                                                 @PathVariable GatheringStatus status,
+    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable GatheringStatus status,
                                                                  @PathVariable(required = false) AppTechPlatform platform,
                                                                  Principal principal,
                                                                  @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.findGathering(memberId, who, status, platform,  page));
+        return ResponseEntity.ok(gatheringService.findGathering(memberId, status, platform,  page));
+    }
+
+    @GetMapping(value = {"/my/{memberStatus}/{made}", "/my/{memberStatus}"})
+    @Operation(summary = "나의 모임 가져오기", description = "내가 참여한 모임을 가져옵니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+    })
+    @Parameter(name = "made" , description = "made : [] or [me]")
+    @Parameter(name = "memberStatus", description = "memberStatus : [ONGOING] or [PARTIALLY_LEFT, COMPLETED]", example = "TOSS")
+    public ResponseEntity<GatheringPageResponseDto> getMyGathering(@PathVariable GatheringMemberStatus memberStatus,
+                                                                 @PathVariable(required = false) String made,
+                                                                 Principal principal,
+                                                                 @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
+        Long memberId = Long.parseLong(principal.getName());
+        return ResponseEntity.ok(gatheringService.findMyGathering(memberId, memberStatus, made,  page));
     }
 
     @GetMapping(value = "/platform")

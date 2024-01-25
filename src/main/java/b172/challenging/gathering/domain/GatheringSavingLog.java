@@ -1,6 +1,5 @@
 package b172.challenging.gathering.domain;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,9 +14,6 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@JsonIgnoreProperties({
-        "gatheringMember"
-})
 public class GatheringSavingLog {
 
     @Id

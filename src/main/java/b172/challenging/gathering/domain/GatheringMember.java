@@ -9,7 +9,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -55,8 +54,8 @@ public class GatheringMember {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "gatheringMember", cascade = {CascadeType.REMOVE})
-    private List<GatheringSavingLog> gatheringSavingLogs = new ArrayList<>();
+    @OneToMany(mappedBy = "gatheringMember", cascade = CascadeType.ALL)
+    private List<GatheringSavingLog> gatheringSavingLogs;
 
     @PrePersist
     protected void onCreate() {

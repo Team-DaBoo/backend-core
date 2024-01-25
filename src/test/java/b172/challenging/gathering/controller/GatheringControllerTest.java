@@ -80,7 +80,7 @@ class GatheringControllerTest {
 
         gatheringRepository.save(gathering);
 
-        mockMvc.perform(get("/v1/gathering/in-progress"))
+        mockMvc.perform(get("/v1/gathering/my/PENDING"))
                 .andDo(print())
                 .andExpect(status().isOk());
     }

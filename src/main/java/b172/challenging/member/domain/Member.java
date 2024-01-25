@@ -1,10 +1,7 @@
 package b172.challenging.member.domain;
 
-import b172.challenging.gathering.domain.Gathering;
 import b172.challenging.gathering.domain.GatheringMember;
 import b172.challenging.wallet.domain.MaterialWallet;
-import b172.challenging.wallet.domain.Wallet;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -62,13 +59,10 @@ public class Member {
     @Column(name = "leaved_at")
     private LocalDateTime leavedAt;
 
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.REMOVE })
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.ALL })
     private List<GatheringMember> gatheringMembers;
 
-    @OneToMany(mappedBy = "ownerMember", cascade = { CascadeType.REMOVE })
-    private List<Gathering> gathering;
-
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.REMOVE  })
+    @OneToMany(mappedBy = "member", cascade = { CascadeType.ALL })
     private List<MaterialWallet> materialWallets;
 
     @PrePersist

@@ -1,7 +1,6 @@
 package b172.challenging.gathering.domain;
 
 import b172.challenging.member.domain.Member;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.*;
@@ -75,7 +74,7 @@ public class Gathering {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "gathering", cascade = { CascadeType.REMOVE})
+    @OneToMany(mappedBy = "gathering" , cascade = CascadeType.ALL)
     private List<GatheringMember> gatheringMembers;
 
     @Column(name = "updated_at")
@@ -96,5 +95,11 @@ public class Gathering {
         gatheringMember.setGathering(this);
         this.participantsNum++;
         if(participantsNum == peopleNum) this.status = GatheringStatus.ONGOING;
+    }
+
+    public void leftGatheringMember(GatheringMember gatheringMember){
+        this.gatheringMembers.remove(gatheringMember);
+        gatheringMember.setGathering(this);
+        this.participantsNum--;
     }
 }
