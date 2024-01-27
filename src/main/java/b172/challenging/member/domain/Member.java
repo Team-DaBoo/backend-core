@@ -1,6 +1,7 @@
 package b172.challenging.member.domain;
 
 import b172.challenging.gathering.domain.GatheringMember;
+import b172.challenging.wallet.domain.Wallet;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
