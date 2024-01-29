@@ -6,6 +6,7 @@ import b172.challenging.auth.oauth.handler.Oauth2LoginSuccessHandler;
 import b172.challenging.auth.service.CustomOauthService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.Collections;
+import java.util.List;
 
 
 @Slf4j
@@ -35,6 +37,17 @@ public class SecurityConfig {
     private final Oauth2LoginSuccessHandler oauth2LoginSuccessHandler;
     private final Oauth2LoginFailureHandler oauth2LoginFailureHandler;
 
+    @Value("${spring.profiles.active}")
+    private String activeProfile;
+
+    @Value("${app.cors.allowedOrigins.local}")
+    private String corsLocal;
+
+    @Value("${app.cors.allowedOrigins.dev}")
+    private String corsDev;
+
+    @Value("${app.cors.allowedOrigins.prod}")
+    private String corsProd;
     @Bean
     @Profile(value = {"local","dev"})
     public WebSecurityCustomizer configureH2ConsoleEnable() {
@@ -43,12 +56,20 @@ public class SecurityConfig {
     }
 
     // ⭐️ CORS 설정
+    @Bean
     CorsConfigurationSource corsConfigurationSource() {
+        String corsUrl = switch (activeProfile) {
+            case "dev" -> corsDev;
+            case "prod" -> corsProd;
+            default -> corsLocal;
+        };
+        List<String> corsList = List.of(corsUrl.split(","));
+
         return request -> {
             CorsConfiguration config = new CorsConfiguration();
             config.setAllowedHeaders(Collections.singletonList("*"));
             config.setAllowedMethods(Collections.singletonList("*"));
-            config.setAllowedOriginPatterns(Collections.singletonList("http://localhost:3000")); // ⭐️ 허용할 origin
+            config.setAllowedOriginPatterns(corsList); // ⭐️ 허용할 origin
             config.setAllowCredentials(true);
             return config;
         };
