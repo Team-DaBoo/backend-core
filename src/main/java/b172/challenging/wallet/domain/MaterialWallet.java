@@ -26,7 +26,7 @@ public class MaterialWallet {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_material_id", nullable = false)
-    @Schema(description = "집 종류 Id")
+    @Schema(description = "집 만들 재료 종류 Id")
     private HomeMaterial homeMaterial;
 
     @Column(name = "collected", nullable = false, columnDefinition = "bigint default 0")

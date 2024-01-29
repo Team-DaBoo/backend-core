@@ -34,4 +34,8 @@ public class GatheringSavingLog {
     public void setAmount(Long amount){
         this.amount = amount;
     }
+
+    public void setGatheringMember(GatheringMember gatheringMember){
+        this.gatheringMember = gatheringMember;
+    }
 }

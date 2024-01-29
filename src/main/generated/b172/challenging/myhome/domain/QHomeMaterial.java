@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.*;
 import com.querydsl.core.types.PathMetadata;
 import javax.annotation.processing.Generated;
 import com.querydsl.core.types.Path;
+import com.querydsl.core.types.dsl.PathInits;
 
 
 /**
@@ -17,24 +18,39 @@ public class QHomeMaterial extends EntityPathBase<HomeMaterial> {
 
     private static final long serialVersionUID = 1346934751L;
 
+    private static final PathInits INITS = PathInits.DIRECT2;
+
     public static final QHomeMaterial homeMaterial = new QHomeMaterial("homeMaterial");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
+
+    public final ListPath<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet> materialWallet = this.<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet>createList("materialWallet", b172.challenging.wallet.domain.MaterialWallet.class, b172.challenging.wallet.domain.QMaterialWallet.class, PathInits.DIRECT2);
+
+    public final QMyHome myHome;
 
     public final StringPath name = createString("name");
 
     public final NumberPath<Long> needed = createNumber("needed", Long.class);
 
     public QHomeMaterial(String variable) {
-        super(HomeMaterial.class, forVariable(variable));
+        this(HomeMaterial.class, forVariable(variable), INITS);
     }
 
     public QHomeMaterial(Path<? extends HomeMaterial> path) {
-        super(path.getType(), path.getMetadata());
+        this(path.getType(), path.getMetadata(), PathInits.getFor(path.getMetadata(), INITS));
     }
 
     public QHomeMaterial(PathMetadata metadata) {
-        super(HomeMaterial.class, metadata);
+        this(metadata, PathInits.getFor(metadata, INITS));
+    }
+
+    public QHomeMaterial(PathMetadata metadata, PathInits inits) {
+        this(HomeMaterial.class, metadata, inits);
+    }
+
+    public QHomeMaterial(Class<? extends HomeMaterial> type, PathMetadata metadata, PathInits inits) {
+        super(type, metadata, inits);
+        this.myHome = inits.isInitialized("myHome") ? new QMyHome(forProperty("myHome")) : null;
     }
 
 }

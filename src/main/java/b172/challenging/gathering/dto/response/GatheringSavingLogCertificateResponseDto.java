@@ -1,4 +1,4 @@
-package b172.challenging.gathering.dto;
+package b172.challenging.gathering.dto.response;
 
 import lombok.Builder;
 

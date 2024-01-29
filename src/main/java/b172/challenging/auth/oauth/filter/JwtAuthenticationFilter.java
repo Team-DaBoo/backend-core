@@ -1,19 +1,21 @@
 package b172.challenging.auth.oauth.filter;
 
 import b172.challenging.auth.oauth.CustomOauth2User;
+import b172.challenging.common.exception.ExceptionResponseDto;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.member.domain.Member;
 import b172.challenging.auth.service.CustomOauthService;
 import b172.challenging.auth.service.JwtService;
 import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.ErrorCode;
-import jakarta.persistence.EntityNotFoundException;
+import b172.challenging.common.exception.Exceptions;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,7 +26,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -42,36 +43,60 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
-        if (request.getRequestURI().equals(ALLOW_PATH)) {
-            filterChain.doFilter(request, response);
-            return;
+        try {
+            if (request.getRequestURI().equals(ALLOW_PATH)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+            String refreshToken = jwtService.extractRefreshToken(request)
+                    .filter(jwtService::verifyToken)
+                    .orElse(null);
+            /**
+             * refresh token 전송시 access, refresh token 모두 재발급
+             */
+            if (refreshToken != null) {
+                try {
+                    checkRefreshTokenAndReIssueTokens(response, refreshToken);
+                } catch (CustomRuntimeException e) {
+                    throw e;
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                return;
+            }
+            checkAccessTokenAndAuthentication(request, response, filterChain);
+        } catch (CustomRuntimeException e) {
+            log.error(e.getMessage());
+                setExceptionResponse(response, Exceptions.UNAUTHORIZED);
         }
-        String refreshToken = jwtService.extractRefreshToken(request)
-                .filter(jwtService::verifyToken)
-                .orElse(null);
-        /**
-         * refresh token 전송시 access, refresh token 모두 재발급
-         */
-        if (refreshToken != null) {
-            try {
-                checkRefreshTokenAndReIssueTokens(response, refreshToken);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            } return;
-        }
-        checkAccessTokenAndAuthentication(request, response, filterChain);
+    }
+
+    private void setExceptionResponse(HttpServletResponse response, Exceptions e) throws RuntimeException, IOException {
+        response.setCharacterEncoding("UTF-8");
+        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+        response.setStatus(e.getStatusCode());
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        ExceptionResponseDto responseDto = ExceptionResponseDto.of(
+                e.getStatusCode(),
+                e.getErrorCode(),
+                e.getMessage()
+        );
+
+        String jsonResponse = objectMapper.writeValueAsString(responseDto);
+        response.getWriter().write(jsonResponse);
     }
 
     public void checkRefreshTokenAndReIssueTokens(HttpServletResponse response, String refreshToken) throws Exception {
         Long memberId = jwtService.extractMemberId(refreshToken);
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
 
         String storedJwtCode = member.getJwtCode();
 
         String tokenJwtCode = jwtService.extractJwtCode(refreshToken);
         if (!tokenJwtCode.equals(storedJwtCode)) {
-            throw new RuntimeException("Refresh Token이 올바르지 않습니다.");
+            new CustomRuntimeException(Exceptions.UNAUTHORIZED);
         }
         jwtService.sendAccessAndRefreshToken(
                 response, jwtService.createAccessToken(memberId, member.getRole()), jwtService.createRefreshToken(memberId)
@@ -89,6 +114,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         String jwtCode = jwtService.extractJwtCode(accessToken);
                         Member member = verifyJwtCodeAndAuthenticate(memberId, jwtCode);
                         saveAuthentication(member);
+                    } catch (CustomRuntimeException e) {
+                        throw e;
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
@@ -99,10 +126,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     public Member verifyJwtCodeAndAuthenticate(Long memberId, String jwtCode) {
         memberRepository.findJwtCodeById(memberId)
                 .filter(savedJwtCode -> savedJwtCode.equals(jwtCode))
-                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.UNAUTHORIZED));
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.UNAUTHORIZED));
         return memberRepository.findById(memberId)
-                .orElseThrow(() -> new EntityNotFoundException(
-                                "사용자 ID: " + memberId + "를 찾을 수 없습니다."));
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.UNAUTHORIZED));
     }
 
     public void saveAuthentication(Member member) {

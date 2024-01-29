@@ -4,7 +4,7 @@ import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.ErrorCode;
+import b172.challenging.common.exception.Exceptions;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
@@ -135,8 +135,9 @@ public class JwtService {
 
     public Member checkMemberId(Long memberId) {
         return memberRepository.findById(memberId)
-                .orElseThrow(() ->  new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
+                .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
     }
+
     public String saveRandomJwtCode(Long memberId) {
         String jwtCode = generateJwtCode();
         memberRepository.updateJwtCodeById(memberId, jwtCode);
