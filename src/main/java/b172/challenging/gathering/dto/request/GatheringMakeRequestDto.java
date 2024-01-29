@@ -24,6 +24,9 @@ public record GatheringMakeRequestDto(
         @NotBlank(message = "목표 금액을 설정 해야 합니다.")
         Long goalAmount,
 
+        @NotBlank(message = "이미지 Url을 설정 해야 합니다.")
+        String gatheringImageUrl,
+
         @NotBlank(message = "시작 날짜를 설정 해야 합니다.")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
