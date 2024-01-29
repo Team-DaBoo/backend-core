@@ -11,6 +11,7 @@ public enum Exceptions {
     UNAUTHORIZED(401, "2002", "인증 되지 않은 사용자 입니다."),
     ACCESS_DENIED(403, "2003","접근이 거부 되었습니다."),
     NOT_FOUND_MEMBER(404, "2004", "요청한 ID에 해당 하는 사용자를 찾을 수 없습니다."),
+    DUPLICATE_NICKNAME(409, "2109", "중복된 닉네임이 존재합니다."),
 
     NOT_FOUND_GATHERING(404,"3004","저장된 모임이 없습니다."),
 

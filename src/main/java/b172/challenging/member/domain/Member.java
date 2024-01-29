@@ -98,6 +98,13 @@ public class Member {
         this.nickname = nickname;
     }
 
+    public void setBirthYear(Long birthYear) {
+        this.birthYear = birthYear;
+    }
+
+    public void setSex(Sex sex) {
+        this.sex = sex;
+    }
     public void setRole(Role role) {
         this.role = role;
     }
