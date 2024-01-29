@@ -2,8 +2,6 @@ package b172.challenging.wallet.service;
 
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
-import b172.challenging.member.domain.Member;
-import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.wallet.domain.MaterialWallet;
 import b172.challenging.wallet.domain.Wallet;
 import b172.challenging.wallet.dto.MaterialWalletResponseDto;
@@ -14,21 +12,18 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class WalletService {
     private final WalletRepository walletRepository;
     private final MaterialWalletRepository materialWalletRepository;
-    private final MemberRepository memberRepository;
 
     public WalletResponseDto findMyWallet (Long memberId){
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        Wallet wallet = walletRepository.findByMember(member)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        Optional<Wallet> optionalWallet = walletRepository.findByMemberId(memberId);
 
-        return WalletResponseDto.builder()
+        return optionalWallet.map( wallet -> WalletResponseDto.builder()
                 .id(wallet.getId())
                 .member(wallet.getMember())
                 .myHome(wallet.getMyHome())
@@ -36,18 +31,18 @@ public class WalletService {
                 .point(wallet.getPoint())
                 .saveAmount(wallet.getSaveAmount())
                 .homeUpdatedAt(wallet.getHomeUpdatedAt())
-                .build();
+                .build())
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
     }
 
     public MaterialWalletResponseDto findMyMaterialWallet (Long memberId){
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        List<MaterialWallet> materialWalletList = materialWalletRepository.findByMember(member);
+        List<MaterialWallet> materialWalletList = materialWalletRepository.findByMemberId(memberId);
         if(materialWalletList.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET);
         }
 
-        return MaterialWalletResponseDto.builder()
+        return MaterialWalletResponseDto
+                .builder()
                 .materialWallet(materialWalletList)
                 .build();
 
