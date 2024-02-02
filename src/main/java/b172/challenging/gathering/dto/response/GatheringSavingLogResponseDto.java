@@ -1,11 +1,9 @@
-package b172.challenging.gathering.dto.response;
+package b172.challenging.gathering.dto;
 
-import b172.challenging.gathering.domain.GatheringMember;
+import b172.challenging.gathering.domain.GatheringSavingLog;
 import lombok.Builder;
-
-import java.util.List;
 
 @Builder
 public record GatheringSavingLogResponseDto(
-        List<GatheringMember>  gatheringMemberList
+        GatheringSavingLog gatheringSavingLog
 ) { }

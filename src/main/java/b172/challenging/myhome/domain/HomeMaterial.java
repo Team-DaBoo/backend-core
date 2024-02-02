@@ -1,22 +1,15 @@
 package b172.challenging.myhome.domain;
 
-import b172.challenging.wallet.domain.MaterialWallet;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Entity
 @Getter
 @Table(name = "home_material")
 @NoArgsConstructor
 @Schema(description = "집에 필요한 자재")
-@JsonIgnoreProperties({
-        "materialWallet"
-})
 public class HomeMaterial {
 
     @Id
@@ -24,12 +17,9 @@ public class HomeMaterial {
     @Column(name = "home_material_id")
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "home_id", nullable = false, columnDefinition = "bigint default 1")
-    private MyHome myHome;
-
-    @OneToMany(mappedBy = "homeMaterial", cascade = CascadeType.REMOVE)
-    List<MaterialWallet> materialWallet;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "home_id", nullable = false)
+//    private MyHome myHome;
 
     @Column(nullable = false, length = 30)
     @Schema(description = "재료 이름")

@@ -34,8 +34,8 @@ public class MemberNicknameService {
             "건장한", "성숙한", "부드러운", "친절한", "당당한",
             "활발한", "창의적인", "화려한", "훌륭한", "자유로운",
             "똑똑한", "명랑한", "화목한", "단호한", "밝은",
-            "신나는", "섬세한", "진중한", "꼼꼼한", "단순한",
-            "착한", "근면한", "상냥한", "깔끔한", "책임있는",
+            "신랄한", "섬세한", "진중한", "꼼꼼한", "단순한",
+            "착한", "근면한", "자주하는", "깔끔한", "책임있는",
             "용기있는", "따뜻한", "도전적인", "호기심많은", "진정한",
             "성실한", "날카로운", "총명한", "배려심있는", "침착한",
             "즐거운", "위풍당당한", "배고픈", "유연한", "의욕적인"
@@ -70,11 +70,6 @@ public class MemberNicknameService {
 
     public boolean isNicknameExists(String nickname) {
         Optional<Member> existingMember = memberRepository.findByNickname(nickname);
-        return existingMember.isPresent();
-    }
-
-    public boolean isNicknameExistsExcludeMe(Member member, String nickname) {
-        Optional<Member> existingMember = memberRepository.findByNicknameAndIdNot(nickname, member.getId());
         return existingMember.isPresent();
     }
 }

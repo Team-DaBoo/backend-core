@@ -22,13 +22,13 @@ public class Wallet {
     private Long id;
 
     @Schema(description = "Member id")
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
     @Schema(description = "MyHome id")
     @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "home_id", columnDefinition = "bigint default 1") // FIXME: home 정보 추가 후 nullable=false로 변경
+    @JoinColumn(name = "home_id") // FIXME: home 정보 추가 후 nullable=false로 변경
     private MyHome myHome;
 
     @Schema(description = "나의 집 이름")

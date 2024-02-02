@@ -34,8 +34,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final DateTimePath<java.time.LocalDateTime> leavedAt = createDateTime("leavedAt", java.time.LocalDateTime.class);
 
-    public final ListPath<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet> materialWallets = this.<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet>createList("materialWallets", b172.challenging.wallet.domain.MaterialWallet.class, b172.challenging.wallet.domain.QMaterialWallet.class, PathInits.DIRECT2);
-
     public final StringPath nickname = createString("nickname");
 
     public final StringPath oauthId = createString("oauthId");

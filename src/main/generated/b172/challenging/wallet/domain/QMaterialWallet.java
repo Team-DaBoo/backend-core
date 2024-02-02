@@ -48,7 +48,7 @@ public class QMaterialWallet extends EntityPathBase<MaterialWallet> {
 
     public QMaterialWallet(Class<? extends MaterialWallet> type, PathMetadata metadata, PathInits inits) {
         super(type, metadata, inits);
-        this.homeMaterial = inits.isInitialized("homeMaterial") ? new b172.challenging.myhome.domain.QHomeMaterial(forProperty("homeMaterial"), inits.get("homeMaterial")) : null;
+        this.homeMaterial = inits.isInitialized("homeMaterial") ? new b172.challenging.myhome.domain.QHomeMaterial(forProperty("homeMaterial")) : null;
         this.member = inits.isInitialized("member") ? new b172.challenging.member.domain.QMember(forProperty("member")) : null;
     }
 

@@ -3,9 +3,8 @@ package b172.challenging.gathering.dto.response;
 import lombok.Builder;
 
 @Builder
-public record GatheringStatisticsResponseDto(
+public record GatheringStatusCountResponseDto (
     Long onGoingCount,
     Long completedCount,
-    Long ownerGatheringCount,
-    Double achievementRate
+    Long ownerGatheringCount
     ){ }

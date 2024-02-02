@@ -1,6 +1,7 @@
 package b172.challenging.gathering.domain;
 
 import b172.challenging.member.domain.Member;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -9,7 +10,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -25,13 +25,15 @@ public class GatheringMember {
     @Column(name = "gathering_member_id")
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id" ,nullable = false)
+    @JsonIgnore
     @Schema(description = "모임 ID")
     private Gathering gathering;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id", nullable = false)
+    @JsonIgnore
     @Schema(description = "가입한 사용자 ID")
     private Member member;
 
@@ -54,8 +56,8 @@ public class GatheringMember {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @OneToMany(mappedBy = "gatheringMember", cascade = CascadeType.ALL)
-    private List<GatheringSavingLog> gatheringSavingLogs;
+//    @OneToMany(mappedBy = "gatheringMember", cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+//    private List<GatheringSavingLog> gatheringSavingLog;
 
     @PrePersist
     protected void onCreate() {
@@ -74,8 +76,8 @@ public class GatheringMember {
         this.status = status;
     }
 
-    public void addSavingLog(GatheringSavingLog gatheringSavingLog){
-        gatheringSavingLogs.add(gatheringSavingLog);
-        gatheringSavingLog.setGatheringMember(this);
+    public GatheringMember(Long id){
+        this.id = id;
     }
+
 }

@@ -7,7 +7,7 @@ import b172.challenging.badge.dto.response.BadgeMemberResponseDto;
 import b172.challenging.badge.dto.response.BadgeResponseDto;
 import b172.challenging.badge.repository.BadgeCustomRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.Exceptions;
+import b172.challenging.common.exception.ErrorCode;
 import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ public class BadgeService {
 
     public BadgeMemberResponseDto findMemberBadgeList(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+                .orElseThrow(() ->  new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
 
         List<Tuple> badgeMemberList = badgeCustomRepository.findBadgeMemberWithBadgeByMemberId(memberId);
 

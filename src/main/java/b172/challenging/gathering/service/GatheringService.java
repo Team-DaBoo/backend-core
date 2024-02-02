@@ -1,15 +1,11 @@
 package b172.challenging.gathering.service;
 
-import b172.challenging.gathering.dto.GatheringDto;
-import b172.challenging.gathering.dto.GatheringMemberDto;
-import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
-import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
-import b172.challenging.gathering.repository.GatheringImageRepository;
-import b172.challenging.gathering.repository.GatheringMemberCustomRepository;
+import b172.challenging.gathering.dto.OngoingGatheringResponseDto;
+import b172.challenging.gathering.dto.PendingGatheringResponseDto;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.Exceptions;
+import b172.challenging.common.exception.ErrorCode;
 import b172.challenging.gathering.domain.*;
 import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
 import b172.challenging.gathering.dto.response.*;
@@ -23,89 +19,74 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class GatheringService {
     private final GatheringRepository gatheringRepository;
     private final GatheringMemberRepository gatheringMemberRepository;
-    private final GatheringMemberCustomRepository gatheringMemberCustomRepository;
-    private final GatheringImageRepository gatheringImageRepository;
     private final MemberRepository memberRepository;
 
-    public GatheringPageResponseDto findGathering(GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
-        Page<Gathering> gatheringPage;
-        if (platform == null) {
-            gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
-                    ? gatheringRepository.findByStatus(GatheringStatus.PENDING, page)
-                    : gatheringRepository.findByStatusNot(GatheringStatus.PENDING, page);
-        } else {
-            gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
-                    ? gatheringRepository.findByPlatformAndStatus(platform, GatheringStatus.PENDING, page)
-                    : gatheringRepository.findByPlatformAndStatusNot(platform, GatheringStatus.PENDING, page);
-        }
-        return getGatheringPageResponseDto(page, gatheringPage);
-    }
+    public GatheringPageResponseDto findGatheringByPlatform (AppTechPlatform platform, GatheringStatus status, Pageable page){
+        Page<Gathering> gatheringsPage =
+                status.equals(GatheringStatus.PENDING)
+                ?  gatheringRepository.findByPlatformAndStatus(platform, GatheringStatus.PENDING, page)
+                :  gatheringRepository.findByPlatformAndStatusNot(platform, GatheringStatus.PENDING, page);
 
-    public GatheringPageResponseDto findMyGathering(Long memberId, GatheringMemberStatus gatheringMemberStatus, String made, Pageable page) {
-        Page<Gathering> gatheringMyPage;
-        if(made == null) {
-            gatheringMyPage = gatheringMemberStatus.equals(GatheringMemberStatus.ONGOING)
-                    ? gatheringRepository.findByGatheringMembersMember_IdAndGatheringMembersStatus(memberId,GatheringMemberStatus.ONGOING, page)
-                    : gatheringRepository.findByGatheringMembersMember_IdAndGatheringMembersStatusNot(memberId,GatheringMemberStatus.ONGOING, page);
-        } else if (made.equals("me")){
-            gatheringMyPage = gatheringMemberStatus.equals(GatheringMemberStatus.ONGOING)
-                    ? gatheringRepository.findByOwnerMember_IdAndGatheringMembersStatus(memberId,GatheringMemberStatus.ONGOING, page)
-                    : gatheringRepository.findByOwnerMember_IdAndGatheringMembersStatusNot(memberId,GatheringMemberStatus.ONGOING, page);
-        } else {
-            throw new CustomRuntimeException(Exceptions.INVALID_REQUEST);
-        }
-        return getGatheringPageResponseDto(page, gatheringMyPage);
-    }
 
-    private GatheringPageResponseDto getGatheringPageResponseDto(Pageable page, Page<Gathering> gatheringPage) {
-        List<Gathering> gatherings = new ArrayList<>(gatheringPage.getContent());
-
-        if (gatherings.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
-        }
-
-        List<GatheringDto> gatheringPageDto = gatherings.stream().map(GatheringDto::new).toList();
+        List<Gathering> gatherings  = new ArrayList<>(gatheringsPage.getContent());
 
         return GatheringPageResponseDto.builder()
-                .gatheringPages(gatheringPageDto)
+                .gatherings(gatherings)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
-                .totalElements(gatheringPage.getTotalElements())
-                .totalPages(gatheringPage.getTotalPages())
-                .lastPage(gatheringPage.isLast())
+                .totalElements(gatheringsPage.getTotalElements())
+                .totalPages(gatheringsPage.getTotalPages())
+                .last(gatheringsPage.isLast())
                 .build();
     }
 
-    private GatheringImage generateGatheringImage() {
-        List<GatheringImage> allImages = gatheringImageRepository.findAll();
-        if (allImages == null || allImages.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_IMAGE);
-        }
+    public GatheringPageResponseDto findAllGathering(GatheringStatus status, Pageable page) {
+        Page<Gathering> gatheringsPage =
+                status.equals(GatheringStatus.PENDING)
+                ? gatheringRepository.findByStatus(GatheringStatus.PENDING, page)
+                : gatheringRepository.findByStatusNot(GatheringStatus.PENDING, page);
+        List<Gathering> gatherings  = new ArrayList<>(gatheringsPage.getContent());
 
-        Random random = new Random();
-        int randomIndex = random.nextInt(allImages.size());
 
-        return allImages.get(randomIndex);
+        return GatheringPageResponseDto.builder()
+                .gatherings(gatherings)
+                .pageNo(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .totalElements(gatheringsPage.getTotalElements())
+                .totalPages(gatheringsPage.getTotalPages())
+                .last(gatheringsPage.isLast())
+                .build();
     }
 
+    public GatheringMemberPageResponseDto findMyGatheringInProgress(Long MemberId, Pageable page) {
+        Page<GatheringMember> gatheringMembersPage = gatheringMemberRepository.findByMemberIdAndStatus(MemberId, GatheringMemberStatus.ONGOING, page);
+        List<GatheringMember> gatheringMembers  = new ArrayList<>(gatheringMembersPage.getContent());
+        return GatheringMemberPageResponseDto.builder()
+                .gatheringMembers(gatheringMembers)
+                .pageNo(page.getPageNumber())
+                .pageSize(page.getPageSize())
+                .totalElements(gatheringMembersPage.getTotalElements())
+                .totalPages(gatheringMembersPage.getTotalPages())
+                .last(gatheringMembersPage.isLast())
+                .build();
+    }
 
     @Transactional
     public GatheringMakeResponseDto makeGathering(Long memberId, GatheringMakeRequestDto gatheringMakeRequestDto) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+                .orElseThrow(() -> new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
+
         Gathering gathering = Gathering.builder()
-                .ownerMember(member)
+                 .ownerMember(member)
                 .platform(gatheringMakeRequestDto.appTechPlatform())
-                .gatheringImageUrl(gatheringMakeRequestDto.gatheringImageUrl())
                 .title(gatheringMakeRequestDto.title())
-                .description(gatheringMakeRequestDto.description())
                 .peopleNum(gatheringMakeRequestDto.peopleNum())
                 .workingDays(gatheringMakeRequestDto.workingDays())
                 .goalAmount(gatheringMakeRequestDto.goalAmount())
@@ -127,6 +108,7 @@ public class GatheringService {
 
         gatheringRepository.save(gathering);
 
+
         return GatheringMakeResponseDto.builder()
                 .id(gathering.getId())
                 .title(gathering.getTitle())
@@ -135,8 +117,8 @@ public class GatheringService {
     }
 
     public PendingGatheringResponseDto findPendingGathering(Long gatheringId, Long MemberId) {
-        Gathering gathering = gatheringRepository.findById(gatheringId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
+        Optional<Gathering> gatheringOptional = gatheringRepository.findById(gatheringId);
+        Gathering gathering = gatheringOptional.orElseThrow(() -> new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
 
         List<GatheringMember> gatheringMemberList = gatheringMemberRepository.findByGatheringAndStatus(gathering, GatheringMemberStatus.ONGOING);
 
@@ -144,11 +126,9 @@ public class GatheringService {
 
         return PendingGatheringResponseDto.builder()
                 .title(gathering.getTitle())
-                .description(gathering.getDescription())
                 .gatheringStatus(gathering.getStatus())
                 .remainNum(gathering.getPeopleNum() - gatheringMemberList.size())
                 .appTechPlatform(gathering.getPlatform())
-                .gatheringImage(gathering.getGatheringImageUrl())
                 .startDate(gathering.getStartDate())
                 .endDate(gathering.getEndDate())
                 .workingDays(gathering.getWorkingDays())
@@ -158,17 +138,16 @@ public class GatheringService {
     }
 
     public OngoingGatheringResponseDto findOngoingGathering(Long gatheringId) {
-        Gathering gathering = gatheringRepository.findById(gatheringId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
+
+        Optional<Gathering> gatheringOptional = gatheringRepository.findById(gatheringId);
+        Gathering gathering = gatheringOptional.orElseThrow(() -> new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
 
         List<GatheringMember> gatheringMemberList = gatheringMemberRepository.findByGatheringAndStatus(gathering, GatheringMemberStatus.ONGOING);
 
 
         return OngoingGatheringResponseDto.builder()
                 .title(gathering.getTitle())
-                .description(gathering.getDescription())
                 .appTechPlatform(gathering.getPlatform())
-                .gatheringImage(gathering.getGatheringImageUrl())
                 .startDate(gathering.getStartDate())
                 .endDate(gathering.getEndDate())
                 .workingDays(gathering.getWorkingDays())
@@ -177,65 +156,48 @@ public class GatheringService {
                 .build();
     }
 
-    @Transactional
-    public GatheringMemberDto joinGathering(Long memberId, Long gatheringId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        Gathering gathering = gatheringRepository.findById(gatheringId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
-        GatheringMember gatheringMember = gatheringMemberRepository.findByMember(member)
-                .orElse(GatheringMember.builder()
-                        .member(member)
-                        .gathering(gathering)
-                        .amount(0L)
-                        .count(0)
-                        .build()
-                );
-        gatheringMember.setStatus(GatheringMemberStatus.ONGOING);
-        gathering.addGatheringMember(gatheringMember);
+    public JoinGatheringResponseDto joinGathering(Long MemberId, Long gatheringId) {
+        Member member = new Member(MemberId);
+        Gathering gathering = new Gathering(gatheringId);
+        GatheringMember gatheringMember = GatheringMember.builder()
+                .member(member)
+                .gathering(gathering)
+                .status(GatheringMemberStatus.ONGOING)
+                .amount(0L)
+                .count(0).build();
+        GatheringMember savedGatheringMember = gatheringMemberRepository.save(gatheringMember);
 
 
-
-        gatheringRepository.save(gathering);
-
-        return new GatheringMemberDto(gatheringMember);
+        return JoinGatheringResponseDto.builder()
+                .gatheringMember(savedGatheringMember)
+                .build();
     }
 
     @Transactional
-    public GatheringMemberDto leftGathering(Long MemberId, Long gatheringMemberId) {
-        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        Gathering gathering = gatheringRepository.findById(gatheringMember.getId())
-                        .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+    public LeftGatheringResponseDto leftGathering(Long MemberId, Long gatheringMemberId) {
+        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
+
         gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
-        gathering.leftGatheringMember(gatheringMember);
 
-        return new GatheringMemberDto(gatheringMember);
+        gatheringMemberRepository.save(gatheringMember);
+
+        return LeftGatheringResponseDto.builder()
+                .gatheringMember(gatheringMember)
+                .build();
     }
-
-    public Double getAchievementRate(Member member) {
-
-        Integer totalSaving = gatheringMemberCustomRepository.gatheringMemberCountSum(member);
-        Integer totalWorkingDays = gatheringMemberCustomRepository.gatheringMemberWorkingDaysSum(member);
-        if (totalSaving != null && totalWorkingDays != null && totalWorkingDays != 0) {
-            return (double) totalSaving / totalWorkingDays * 100;
-        }
-        return (double) 0.0;
-    }
-
-    public GatheringStatisticsResponseDto gatheringStatistics(Long memberId) {
+  
+    public GatheringStatusCountResponseDto gatheringStatusCount(Long memberId) {
         Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+                .orElseThrow(() ->  new CustomRuntimeException(ErrorCode.NOT_FOUND_MEMBER));
 
         Long onGoingCount = gatheringMemberRepository.countByMemberIdAndStatus(memberId, GatheringMemberStatus.ONGOING);
         Long completedCount = gatheringMemberRepository.countByMemberIdAndStatus(memberId, GatheringMemberStatus.COMPLETED);
         Long ownerGatheringCount = gatheringRepository.countByOwnerMember(member);
-        Double achievementRate = getAchievementRate(member);
 
-        return GatheringStatisticsResponseDto.builder()
+        return GatheringStatusCountResponseDto.builder()
                 .onGoingCount(onGoingCount)
                 .completedCount(completedCount)
                 .ownerGatheringCount(ownerGatheringCount)
-                .achievementRate(achievementRate)
                 .build();
     }
 }
