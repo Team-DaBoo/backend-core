@@ -1,5 +1,6 @@
 package b172.challenging.member.service;
 
+import b172.challenging.auth.event.RegisteredEvent;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.dto.request.MemberProfileUpdateRequestDto;
@@ -9,6 +10,7 @@ import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
 import b172.challenging.member.service.MemberNicknameService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,7 +21,7 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final MemberNicknameService memberNicknameService;
-
+    private final ApplicationEventPublisher publisher;
 
     public Member updateMemberProfile(Long memberId, MemberProfileUpdateRequestDto memberProfileUpdateRequestDto) {
         Member member = memberRepository.findById(memberId)
@@ -36,6 +38,8 @@ public class MemberService {
             member.setRole(Role.MEMBER);
         }
         memberRepository.save(member);
+
+        publisher.publishEvent(new RegisteredEvent(member));
         return member;
     }
 

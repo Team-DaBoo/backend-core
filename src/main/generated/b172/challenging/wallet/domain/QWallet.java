@@ -24,8 +24,6 @@ public class QWallet extends EntityPathBase<Wallet> {
 
     public final StringPath homeName = createString("homeName");
 
-    public final DateTimePath<java.time.LocalDateTime> homeUpdatedAt = createDateTime("homeUpdatedAt", java.time.LocalDateTime.class);
-
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final b172.challenging.member.domain.QMember member;
@@ -35,6 +33,8 @@ public class QWallet extends EntityPathBase<Wallet> {
     public final NumberPath<Long> point = createNumber("point", Long.class);
 
     public final NumberPath<Long> saveAmount = createNumber("saveAmount", Long.class);
+
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
     public QWallet(String variable) {
         this(Wallet.class, forVariable(variable), INITS);
