@@ -24,8 +24,4 @@ public class MyHome {
     @Column(nullable = false, unique = true)
     @Schema(description = "집 레벨")
     private Long level;
-
-    @Column(name = "image_url", nullable = false)
-    @Schema(description = "집 Image Url")
-    private String imageUrl;
 }

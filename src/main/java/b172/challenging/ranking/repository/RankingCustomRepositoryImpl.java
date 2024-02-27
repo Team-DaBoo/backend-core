@@ -51,7 +51,7 @@ public class RankingCustomRepositoryImpl implements RankingCustomRepository{
                 .select(
                         member.id,
                         member.nickname,
-                        myHome.imageUrl.max(),
+                        myHome.level.max(),
                         gatheringSavingLog.amount.sum())
                 .from(gatheringSavingLog)
                 .join(gatheringSavingLog.gatheringMember, gatheringMember)
@@ -59,7 +59,7 @@ public class RankingCustomRepositoryImpl implements RankingCustomRepository{
                 .join(wallet).on(member.id.eq(wallet.member.id))
                 .join(wallet.myHome, myHome)
                 .where(gatheringSavingLog.certificatedAt.loe(startDateTime))
-                .groupBy(member.id, myHome.imageUrl)
+                .groupBy(member.id, myHome.level)
                 .orderBy(gatheringSavingLog.amount.sum().desc())
                 .offset(page.getOffset())
                 .limit(page.getPageSize())
@@ -71,7 +71,7 @@ public class RankingCustomRepositoryImpl implements RankingCustomRepository{
                         tuple.get(gatheringSavingLog.amount.sum()),
                         tuple.get(member.id),
                         tuple.get(member.nickname),
-                        tuple.get(myHome.imageUrl.max())
+                        tuple.get(myHome.level.max())
                 ))
                 .collect(Collectors.toList());
         return new PageImpl<>(rankingResponseDtos, page, results.getTotal());

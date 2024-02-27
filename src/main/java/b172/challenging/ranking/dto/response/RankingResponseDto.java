@@ -7,5 +7,5 @@ public record RankingResponseDto(
         Long totalAmount,
         Long memberId,
         String nickname,
-        String homeImageUrl
+        Long homeLevel
 ) { }

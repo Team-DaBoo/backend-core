@@ -21,8 +21,6 @@ public class QMyHome extends EntityPathBase<MyHome> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final StringPath imageUrl = createString("imageUrl");
-
     public final NumberPath<Long> level = createNumber("level", Long.class);
 
     public final StringPath name = createString("name");
