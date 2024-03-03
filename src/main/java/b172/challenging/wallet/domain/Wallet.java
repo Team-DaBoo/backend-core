@@ -4,6 +4,7 @@ import b172.challenging.myhome.domain.MyHome;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -45,11 +46,27 @@ public class Wallet {
 
     @Schema(description = "집 업데이트 날짜")
     @Column(name = "home_updated_at")
-    private LocalDateTime homeUpdatedAt;
+    private LocalDateTime updatedAt;
+
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
 
     public void savePoint(Long amount){
         this.saveAmount += amount;
         this.point += amount;
     }
 
+    @Builder
+    public Wallet(Long id, String homeName, Long point, Long saveAmount, Member member, MyHome myHome) {
+        this.id = id;
+        this.homeName = homeName;
+        this.point = point;
+        this.saveAmount = saveAmount;
+        this.member = member;
+        this.myHome = myHome;
+    }
 }

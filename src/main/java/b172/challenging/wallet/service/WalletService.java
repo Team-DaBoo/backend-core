@@ -2,6 +2,9 @@ package b172.challenging.wallet.service;
 
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
+import b172.challenging.member.domain.Member;
+import b172.challenging.myhome.domain.MyHome;
+import b172.challenging.myhome.service.MyHomeService;
 import b172.challenging.wallet.domain.MaterialWallet;
 import b172.challenging.wallet.domain.Wallet;
 import b172.challenging.wallet.dto.MaterialWalletResponseDto;
@@ -19,6 +22,7 @@ import java.util.Optional;
 public class WalletService {
     private final WalletRepository walletRepository;
     private final MaterialWalletRepository materialWalletRepository;
+    private final MyHomeService myHomeService;
 
     public WalletResponseDto findMyWallet (Long memberId){
         Optional<Wallet> optionalWallet = walletRepository.findByMemberId(memberId);
@@ -30,7 +34,7 @@ public class WalletService {
                 .myHomeName(wallet.getHomeName())
                 .point(wallet.getPoint())
                 .saveAmount(wallet.getSaveAmount())
-                .homeUpdatedAt(wallet.getHomeUpdatedAt())
+                .homeUpdatedAt(wallet.getUpdatedAt())
                 .build())
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
     }
@@ -46,5 +50,19 @@ public class WalletService {
                 .materialWallet(materialWalletList)
                 .build();
 
+    }
+
+    public void createWallet(Member member) {
+
+        String nickName = member.getNickname();
+        MyHome home = myHomeService.findFirstMyhome();
+        Wallet wallet = Wallet.builder()
+                .homeName(nickName + "의 집")
+                .point(0L)
+                .saveAmount(0L)
+                .member(member)
+                .myHome(home)
+                .build();
+        walletRepository.save(wallet);
     }
 }

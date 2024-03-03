@@ -25,7 +25,10 @@ public enum Exceptions {
 
     NOT_FOUND_WALLET(404,"4004","저장된 포인트를 찾을 수 없습니다."),
 
-    NOT_FOUND_PROTIP(404,"5004" ,"저장된 꿀팁 정보를 찾을 수 없습니다." );
+    NOT_FOUND_PROTIP(404,"5004" ,"저장된 꿀팁 정보를 찾을 수 없습니다." ),
+
+    NOT_FOUND_HOME(404, "6004", "집 데이터를 가져올 수 없습니다.");
+
     private final int statusCode;
     private final String errorCode;
     private final String message;
