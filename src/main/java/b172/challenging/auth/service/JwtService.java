@@ -84,7 +84,7 @@ public class JwtService {
         response.setStatus(HttpServletResponse.SC_OK);
         Cookie cookie = new Cookie(refreshHeader, refreshToken);
         cookie.setMaxAge((int) (refreshTokenExpiration/1000));
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
