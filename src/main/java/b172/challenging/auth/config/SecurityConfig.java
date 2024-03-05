@@ -60,13 +60,13 @@ public class SecurityConfig {
     // ⭐️ CORS 설정
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
-    
+
         String corsUrl = switch (activeProfile) {
             case "dev" -> corsDev;
             case "prod" -> corsProd;
             default -> corsLocal;
         };
-        
+
         List<String> corsList = List.of(corsUrl.split(","));
 
         return request -> {
@@ -75,17 +75,21 @@ public class SecurityConfig {
             config.setAllowedMethods(Collections.singletonList("*"));
             config.setAllowedOriginPatterns(corsList); // ⭐️ 허용할 origin
             config.setAllowCredentials(true);
+            config.setMaxAge(3600L);
+
+            config.setExposedHeaders(Collections.singletonList("Set-Cookie"));
+            config.setExposedHeaders(Collections.singletonList("ACCESS_TOKEN"));
             return config;
         };
     }
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .csrf(AbstractHttpConfigurer::disable)
-                .cors(corsConfiguration -> corsConfiguration.configurationSource(corsConfigurationSource()))
+//                .cors(corsConfiguration -> corsConfiguration.configurationSource(corsConfigurationSource()))
                 .sessionManagement((sessionManagement) ->
                         sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 )
@@ -108,12 +112,13 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/v1/**")).hasAnyRole("MEMBER", "ADMIN")
                         .anyRequest().authenticated()
                 )
-                .oauth2Login((oauth2) -> oauth2
-                        .successHandler(oauth2LoginSuccessHandler)
-                        .failureHandler(oauth2LoginFailureHandler)
-                        .userInfoEndpoint((userInfoEndpoint -> userInfoEndpoint
-                                .userService(customOauthService)))
-                );
+//                .oauth2Login((oauth2) -> oauth2
+//                        .successHandler(oauth2LoginSuccessHandler)
+//                        .failureHandler(oauth2LoginFailureHandler)
+//                        .userInfoEndpoint((userInfoEndpoint -> userInfoEndpoint
+//                                .userService(customOauthService)))
+//                )
+        ;
         http.addFilterAfter(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class);
         return http.build();
     }

@@ -1,6 +1,5 @@
 package b172.challenging.auth.oauth.handler;
 
-import b172.challenging.member.domain.Role;
 import b172.challenging.auth.oauth.CustomOauth2User;
 import b172.challenging.auth.service.CustomOauthService;
 import b172.challenging.auth.service.JwtService;
@@ -32,10 +31,14 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         Long memberId = oauth2User.getMemberId();
         String accessToken = jwtService.createAccessToken(memberId, oauth2User.getRole());
         String refreshToken = jwtService.createRefreshToken(memberId);
-        if (oauth2User.getRole() == Role.GUEST) {
-            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-        } else {jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-        }
+        log.info("oauth2User.getRole() : {}", oauth2User.getRole());
+        log.info("oauth2User.getMemberId() : {}", oauth2User.getMemberId());
+        log.info(accessToken);
+//        if (oauth2User.getRole() == Role.GUEST) {
+//            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+//
+//        } else {jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+//        }
     }
 }
