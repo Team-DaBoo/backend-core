@@ -16,13 +16,13 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -38,7 +38,7 @@ public class AuthController {
     private final MemberRepository memberRepository;
     private final MemberNicknameService memberService;
 
-    @GetMapping("/token/{provider}/{AccessToken}")
+    @GetMapping("/token/{provider}")
     @Operation(summary = "토큰 발급", description = "AccessToken을 통해 JwtToken을 발급합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
@@ -46,8 +46,10 @@ public class AuthController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
     public ResponseEntity<MemberTokenResponseDto> getToken(@PathVariable OauthProvider provider,
-                                                           @PathVariable String AccessToken,
-                                                           HttpServletResponse httpResponse) {
+                                                           HttpServletRequest httpServletRequest) {
+
+        String accessToken = httpServletRequest.getHeader(jwtService.getAccessHeader());
+
         // API User 엔드포인트 URL
         String apiUrl = null;
         if(provider.equals(OauthProvider.GOOGLE)){
@@ -65,7 +67,7 @@ public class AuthController {
             connection.setRequestMethod("GET");
 
             // Authorization 헤더 설정
-            connection.setRequestProperty("Authorization", "Bearer " + AccessToken);
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
 
             // 응답 코드 확인
             int responseCode = connection.getResponseCode();
@@ -114,12 +116,10 @@ public class AuthController {
                 .memberId(member.getId())
                 .nickname(member.getNickname())
                 .role(member.getRole())
+                .accessToken(jwtService.createAccessToken(member.getId(), member.getRole()))
+                .refreshToken(jwtService.createRefreshToken(member.getId()))
                 .oauthId(member.getOauthId())
                 .build();
-
-        // jwt Token 발급하여 줌.
-        jwtService.sendAccessAndRefreshToken(httpResponse, jwtService.createAccessToken(member.getId(), member.getRole()), jwtService.createRefreshToken(member.getId()));
-
 
         return ResponseEntity.ok(memberTokenResponseDto);
     }

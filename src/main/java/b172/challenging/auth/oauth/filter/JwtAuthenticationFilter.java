@@ -1,14 +1,11 @@
 package b172.challenging.auth.oauth.filter;
 
 import b172.challenging.auth.oauth.CustomOauth2User;
-import b172.challenging.common.exception.ExceptionResponseDto;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.member.domain.Member;
-import b172.challenging.auth.service.CustomOauthService;
 import b172.challenging.auth.service.JwtService;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
@@ -16,7 +13,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -42,7 +38,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         // ACCESS_TOKEN 확인
-        String accessToken = request.getHeader(jwtService.getAccessHeader());
+        String accessToken = request.getHeader(jwtService.getAccessHeader()) != null
+                ? request.getHeader(jwtService.getAccessHeader()).replace("Bearer ", "")
+                : null;
+
         if(accessToken != null && jwtService.verifyToken(accessToken)){
             Long memberId = jwtService.extractMemberId(accessToken);
             String jwtCode = jwtService.extractJwtCode(accessToken);
@@ -55,9 +54,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         // REFRESH_TOKEN 확인
         String refreshToken = null;
         Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(jwtService.getRefreshHeader())) {
-                refreshToken = cookie.getValue();
+        if(cookies != null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(jwtService.getRefreshHeader())) {
+                    refreshToken = cookie.getValue();
+                }
             }
         }
 

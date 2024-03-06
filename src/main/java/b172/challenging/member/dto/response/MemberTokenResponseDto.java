@@ -8,5 +8,7 @@ public record MemberTokenResponseDto(
     Long memberId,
     String nickname,
     Role role,
-    String oauthId
+    String oauthId,
+    String accessToken,
+    String refreshToken
 ) { }
