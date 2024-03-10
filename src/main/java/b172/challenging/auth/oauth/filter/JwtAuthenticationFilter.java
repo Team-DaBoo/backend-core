@@ -37,12 +37,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
 
+        if(request.getServletPath().startsWith("/oauth")){
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // ACCESS_TOKEN 확인
         String accessToken = request.getHeader(jwtService.getAccessHeader()) != null
                 ? request.getHeader(jwtService.getAccessHeader()).replace("Bearer ", "")
                 : null;
-
-        log.info("accessToken: {}", accessToken);
 
         if(accessToken != null && jwtService.verifyToken(accessToken)){
             Long memberId = jwtService.extractMemberId(accessToken);
