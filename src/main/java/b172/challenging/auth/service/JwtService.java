@@ -8,7 +8,7 @@ import b172.challenging.common.exception.Exceptions;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.Claim;
-import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -80,44 +80,37 @@ public class JwtService {
 
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setHeader(accessHeader, accessToken);
-        response.setHeader(refreshHeader, refreshToken);
         response.setStatus(HttpServletResponse.SC_OK);
+        Cookie cookie = new Cookie(refreshHeader, refreshToken);
+        cookie.setMaxAge((int) (refreshTokenExpiration/1000));
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        response.addCookie(cookie);
+//        response.sendRedirect("/oauth/token/KAKAO");
     }
 
-
-    public Optional<String> extractRefreshToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(refreshHeader));
-    }
-
-
-    public Optional<String> extractAccessToken(HttpServletRequest request) {
-        return Optional.ofNullable(request.getHeader(accessHeader))
-                .filter(refreshToken -> refreshToken.startsWith(BEARER))
-                .map(refreshToken -> refreshToken.replace(BEARER, ""));
-    }
-
-
-    public Long extractMemberId(String token) throws Exception {
+    public Long extractMemberId(String token) throws IllegalArgumentException {
         Claim memberIdClaim = JWT.require(Algorithm.HMAC512(secretKey))
                     .build()
                     .verify(token)
                     .getClaim(MEMBER_ID_CLAIM);
 
         if (memberIdClaim.isNull()) {
-            throw new Exception("사용자 정보를 찾을 수 없습니다.");
+            throw new CustomRuntimeException(Exceptions.UNAUTHORIZED);
         }
         return memberIdClaim.asLong();
     }
 
 
-    public String extractJwtCode(String token) throws Exception{
+    public String extractJwtCode(String token) throws IllegalArgumentException, CustomRuntimeException{
         Claim CodeClaim = JWT.require(Algorithm.HMAC512(secretKey))
                 .build()
                 .verify(token)
                 .getClaim(CODE_CLAIM);
 
         if (CodeClaim.isNull()) {
-            throw new Exception("사용자 정보를 찾을 수 없습니다.");
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
         }
         return CodeClaim.asString();
     }
