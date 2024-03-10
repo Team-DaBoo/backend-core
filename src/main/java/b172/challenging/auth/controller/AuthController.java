@@ -71,13 +71,14 @@ public class AuthController {
             connection.setRequestMethod("GET");
 
             // Authorization 헤더 설정
-            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
+            connection.addRequestProperty("Authorization", "Bearer " + accessToken);
 
             // 응답 코드 확인
             int responseCode = connection.getResponseCode();
-            System.out.println("HTTP 응답 코드: " + responseCode);
+            log.info("HTTP 응답 코드: " + responseCode);
 
             if (responseCode != 200) {
+                log.error(connection.getResponseMessage());
                 return ResponseEntity.status(responseCode).body(null);
             }
             // 응답 본문 읽기
