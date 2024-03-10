@@ -19,9 +19,11 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.net.ssl.HttpsURLConnection;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -32,6 +34,7 @@ import java.security.Principal;
 @RequiredArgsConstructor
 @RequestMapping("/oauth")
 @RestController
+@Slf4j
 public class AuthController {
 
     private final JwtService jwtService;
@@ -50,6 +53,7 @@ public class AuthController {
 
         String accessToken = httpServletRequest.getHeader(jwtService.getAccessHeader());
 
+        log.info("accessToken: {}", accessToken);
         // API User 엔드포인트 URL
         String apiUrl = null;
         if(provider.equals(OauthProvider.GOOGLE)){

@@ -42,6 +42,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 ? request.getHeader(jwtService.getAccessHeader()).replace("Bearer ", "")
                 : null;
 
+        log.info("accessToken: {}", accessToken);
+
         if(accessToken != null && jwtService.verifyToken(accessToken)){
             Long memberId = jwtService.extractMemberId(accessToken);
             String jwtCode = jwtService.extractJwtCode(accessToken);
