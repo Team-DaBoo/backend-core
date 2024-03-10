@@ -54,6 +54,8 @@ public class AuthController {
         String accessToken = httpServletRequest.getHeader(jwtService.getAccessHeader());
 
         log.info("accessToken: {}", accessToken);
+        accessToken = accessToken.replace("Bearer ", "");
+
         // API User 엔드포인트 URL
         String apiUrl = null;
         if(provider.equals(OauthProvider.GOOGLE)){
@@ -71,7 +73,7 @@ public class AuthController {
             connection.setRequestMethod("GET");
 
             // Authorization 헤더 설정
-            connection.addRequestProperty("Authorization", "Bearer " + accessToken);
+            connection.setRequestProperty("Authorization", "Bearer " + accessToken);
 
             // 응답 코드 확인
             int responseCode = connection.getResponseCode();
