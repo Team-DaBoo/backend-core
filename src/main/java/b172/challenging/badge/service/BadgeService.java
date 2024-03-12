@@ -1,50 +1,47 @@
 package b172.challenging.badge.service;
 
-import b172.challenging.member.domain.Member;
-import b172.challenging.member.repository.MemberRepository;
-import b172.challenging.badge.domain.Badge;
+import b172.challenging.activitylog.domain.ActivityType;
+import b172.challenging.badge.domain.BadgeMember;
+import b172.challenging.badge.repository.BadgeMemberRepository;
 import b172.challenging.badge.dto.response.BadgeMemberResponseDto;
 import b172.challenging.badge.dto.response.BadgeResponseDto;
-import b172.challenging.badge.repository.BadgeCustomRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
-import com.querydsl.core.Tuple;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BadgeService {
 
-    private final MemberRepository memberRepository;
-    private final BadgeCustomRepository badgeCustomRepository;
+    private final BadgeMemberRepository badgeMemberRepository;
 
     public BadgeMemberResponseDto findMemberBadgeList(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
 
-        List<Tuple> badgeMemberList = badgeCustomRepository.findBadgeMemberWithBadgeByMemberId(memberId);
+        List<BadgeMember> badgeMemberList = badgeMemberRepository.findByMemberId(memberId);
+
+        if(badgeMemberList.isEmpty()) {
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_BADGE);
+        }
 
         List<BadgeResponseDto> badgeResponseDtos = badgeMemberList.stream()
-                .map(tuple -> {
-                    Badge badge = tuple.get(0, Badge.class);
-                    Boolean hasBadge = tuple.get(1, Boolean.class);
-                    return new BadgeResponseDto(
-                            badge.getId(),
-                            badge.getName(),
-                            badge.getDescription(),
-                            badge.getImageUrl(),
-                            hasBadge
-                    );
+                .map(badgeMember -> {
+                    return BadgeResponseDto.builder()
+                            .id(badgeMember.getBadge().getId())
+                            .name(badgeMember.getBadge().getName())
+                            .description(badgeMember.getBadge().getDescription())
+                            .imageUrl(badgeMember.getBadge().getImageUrl())
+                            .createdAt(badgeMember.getCreatedAt())
+                            .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
 
         return BadgeMemberResponseDto.builder()
+                .memberId(memberId)
                 .badges(badgeResponseDtos)
                 .build();
     }
