@@ -20,9 +20,12 @@ public class QMember extends EntityPathBase<Member> {
 
     public static final QMember member = new QMember("member1");
 
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
     public final NumberPath<Long> birthYear = createNumber("birthYear", Long.class);
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final ListPath<b172.challenging.gathering.domain.GatheringMember, b172.challenging.gathering.domain.QGatheringMember> gatheringMembers = this.<b172.challenging.gathering.domain.GatheringMember, b172.challenging.gathering.domain.QGatheringMember>createList("gatheringMembers", b172.challenging.gathering.domain.GatheringMember.class, b172.challenging.gathering.domain.QGatheringMember.class, PathInits.DIRECT2);
 
@@ -46,7 +49,8 @@ public class QMember extends EntityPathBase<Member> {
 
     public final EnumPath<Sex> sex = createEnum("sex", Sex.class);
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QMember(String variable) {
         super(Member.class, forVariable(variable));

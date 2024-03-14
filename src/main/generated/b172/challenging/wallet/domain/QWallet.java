@@ -22,6 +22,11 @@ public class QWallet extends EntityPathBase<Wallet> {
 
     public static final QWallet wallet = new QWallet("wallet");
 
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
+
     public final StringPath homeName = createString("homeName");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
@@ -34,7 +39,8 @@ public class QWallet extends EntityPathBase<Wallet> {
 
     public final NumberPath<Long> saveAmount = createNumber("saveAmount", Long.class);
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QWallet(String variable) {
         this(Wallet.class, forVariable(variable), INITS);

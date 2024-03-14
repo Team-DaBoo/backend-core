@@ -22,11 +22,14 @@ public class QProTip extends EntityPathBase<ProTip> {
 
     public static final QProTip proTip = new QProTip("proTip");
 
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
     public final StringPath appLinkUrl = createString("appLinkUrl");
 
     public final StringPath content = createString("content");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
@@ -38,7 +41,8 @@ public class QProTip extends EntityPathBase<ProTip> {
 
     public final EnumPath<ProTipType> type = createEnum("type", ProTipType.class);
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public final EnumPath<b172.challenging.common.domain.UseYn> useYn = createEnum("useYn", b172.challenging.common.domain.UseYn.class);
 
