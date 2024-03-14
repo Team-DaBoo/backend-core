@@ -107,19 +107,22 @@ public class SecurityConfig {
                                 , new AntPathRequestMatcher("/api-docs/**")
                                 , new AntPathRequestMatcher("/example/**")
                                 , new AntPathRequestMatcher("/error/**")
+                                , new AntPathRequestMatcher("/v1/**")
+                                , new AntPathRequestMatcher("/admin/**")
                         ).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/v1/members/profile")).hasAnyRole("GUEST", "MEMBER", "ADMIN")
-                        .requestMatchers(new AntPathRequestMatcher("/v1/**")).hasAnyRole("MEMBER", "ADMIN")
+//                        .requestMatchers(new AntPathRequestMatcher("/v1/members/profile")).hasAnyRole("GUEST", "MEMBER", "ADMIN")
+//                        .requestMatchers(new AntPathRequestMatcher("/v1/**")).hasAnyRole("MEMBER", "ADMIN")
+//                        .requestMatchers(new AntPathRequestMatcher("/admin/v1/**")).hasAnyRole("ADMIN")
                         .anyRequest().authenticated()
                 )
-//                .oauth2Login((oauth2) -> oauth2
-//                        .successHandler(oauth2LoginSuccessHandler)
-//                        .failureHandler(oauth2LoginFailureHandler)
-//                        .userInfoEndpoint((userInfoEndpoint -> userInfoEndpoint
-//                                .userService(customOauthService)))
-//                )
+                .oauth2Login((oauth2) -> oauth2
+                        .successHandler(oauth2LoginSuccessHandler)
+                        .failureHandler(oauth2LoginFailureHandler)
+                        .userInfoEndpoint((userInfoEndpoint -> userInfoEndpoint
+                                .userService(customOauthService)))
+                )
         ;
-        http.addFilterAfter(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class);
+//        http.addFilterAfter(jwtAuthenticationFilter, OAuth2LoginAuthenticationFilter.class);
         return http.build();
     }
 
