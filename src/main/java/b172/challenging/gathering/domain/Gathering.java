@@ -1,5 +1,6 @@
 package b172.challenging.gathering.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -17,7 +18,7 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Schema(description = "모임 정보")
-public class Gathering {
+public class Gathering extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -71,24 +72,8 @@ public class Gathering {
     @Schema(description = "만료 일시")
     private LocalDateTime endDate;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
     @OneToMany(mappedBy = "gathering" , cascade = CascadeType.ALL)
     private List<GatheringMember> gatheringMembers;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     public void addGatheringMember(GatheringMember gatheringMember){
         gatheringMembers.add(gatheringMember);

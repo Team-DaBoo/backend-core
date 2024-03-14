@@ -1,5 +1,6 @@
 package b172.challenging.activitylog.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
@@ -7,9 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -17,7 +15,7 @@ import java.time.LocalDateTime;
 @Table(name = "activity_log")
 @NoArgsConstructor
 @AllArgsConstructor
-public class ActivityLog {
+public class ActivityLog extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,13 +41,12 @@ public class ActivityLog {
     @Schema(description = "설명")
     private String description;
 
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    @Schema(description = "일시")
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreated() { this.createdAt = LocalDateTime.now(); }
-
+    public static ActivityLog createActivityLog(Member member, ActivityType activityType, String description) {
+        return ActivityLog.builder()
+                .member(member)
+                .activityCategory(activityType.getParentCategory())
+                .activityType(activityType)
+                .description(description)
+                .build();
+    }
 }

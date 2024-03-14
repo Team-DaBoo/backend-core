@@ -12,5 +12,5 @@ public enum ActivityCategory {
 
     ;
 
-    private final String value;
+    private final String key;
 }

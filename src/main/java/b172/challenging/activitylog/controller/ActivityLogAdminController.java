@@ -1,14 +1,19 @@
 package b172.challenging.activitylog.controller;
 
 import b172.challenging.activitylog.domain.ActivityCategory;
-import b172.challenging.activitylog.dto.ActivityLogPageResponseDto;
+import b172.challenging.activitylog.domain.ActivityLog;
+import b172.challenging.activitylog.domain.ActivityType;
+import b172.challenging.activitylog.dto.ActivityLogResponseDto;
+import b172.challenging.activitylog.event.ActivityLogEvent;
 import b172.challenging.activitylog.service.ActivityService;
+import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -18,7 +23,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.List;
 
 @Tag(name = "유저 활동 로그 API", description = "Member Activity Log API")
@@ -29,8 +33,7 @@ public class ActivityLogAdminController {
 
     private final ActivityService activityService;
 
-
-    @GetMapping(value = {"/","/{memberId}","/{memberId}/{category}"})
+    @GetMapping(value = {"","/{memberId}","/{memberId}/{category}"})
     @Operation(summary = "Category 에 따른 ActivityLog 가져오기", description = "ActivityLog 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -38,11 +41,17 @@ public class ActivityLogAdminController {
     })
     @Parameter(name = "memberId", description = "확인할 유저 Id", example = "1234567")
     @Parameter(name = "category", description = "ActivityCategory 에 대한 정", example = "CERTIFICATE")
-    public ResponseEntity<ActivityLogPageResponseDto> getActivity(Principal principal,
-                                                                  @PathVariable(required = false) Long memberId,
-                                                                  @PathVariable(required = false) ActivityCategory category,
-                                                                  @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
-
+    @Parameter(name = "page", description = "Paging을 위한 파라미터 default: page=0 & size=5 & sort=id,desc", example = "{\n" +
+            "  \"page\": 0,\n" +
+            "  \"size\": 5,\n" +
+            "  \"sort\": [\n" +
+            "    \"id,desc,\"\n" +
+            "    \"member_id,asc\"\n" +
+            "  ]\n" +
+            "}")
+    public ResponseEntity<Page<ActivityLogResponseDto>> getActivity(@PathVariable(required = false) Long memberId,
+                                                                    @PathVariable(required = false) ActivityCategory category,
+                                                                    @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(activityService.findActivityLog(memberId, category, page));
     }
 

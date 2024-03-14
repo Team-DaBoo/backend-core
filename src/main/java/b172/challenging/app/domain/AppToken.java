@@ -1,5 +1,6 @@
 package b172.challenging.app.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.member.domain.Member;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -11,7 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Table(name = "app_token")
 @NoArgsConstructor
-public class AppToken {
+public class AppToken extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,19 +32,4 @@ public class AppToken {
     @Column(nullable = false, length = 128)
     private String token;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 }

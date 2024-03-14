@@ -1,5 +1,6 @@
 package b172.challenging.wallet.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.myhome.domain.MyHome;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -8,14 +9,12 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "wallet")
 @NoArgsConstructor
 @Schema(description = "사용자 포인트")
-public class Wallet {
+public class Wallet extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -43,16 +42,6 @@ public class Wallet {
     @Schema(description = "전체 모은 돈")
     @Column(name = "save_amount", nullable = false, columnDefinition = "bigint default 0")
     private Long saveAmount;
-
-    @Schema(description = "집 업데이트 날짜")
-    @Column(name = "home_updated_at")
-    private LocalDateTime updatedAt;
-
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
 
     public void savePoint(Long amount){

@@ -1,5 +1,6 @@
 package b172.challenging.protip.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.member.domain.Member;
 import b172.challenging.common.domain.UseYn;
 import b172.challenging.protip.dto.ProTipRequestDto;
@@ -22,7 +23,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 @Schema(description = "꿀팁 정보")
-public class ProTip {
+public class ProTip extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,19 +58,6 @@ public class ProTip {
     @Column(name = "use_yn" ,nullable = false)
     @Schema(description = "사용 여부")
     private UseYn useYn;
-
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     public void setContent(Member member, ProTipRequestDto requestDto){
         this.registerId = member;

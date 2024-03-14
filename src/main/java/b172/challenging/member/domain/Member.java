@@ -1,5 +1,6 @@
 package b172.challenging.member.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.gathering.domain.GatheringMember;
 import b172.challenging.wallet.domain.MaterialWallet;
 import jakarta.persistence.*;
@@ -16,7 +17,7 @@ import java.util.List;
         @UniqueConstraint(columnNames = {"oauth_provider", "oauth_id"})
 })
 @NoArgsConstructor
-public class Member {
+public class Member extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -50,12 +51,6 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Sex sex;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
     @Column(name = "leaved_at")
     private LocalDateTime leavedAt;
 
@@ -64,16 +59,6 @@ public class Member {
 
     @OneToMany(mappedBy = "member", cascade = { CascadeType.ALL })
     private List<MaterialWallet> materialWallets;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        this.updatedAt = LocalDateTime.now();
-    }
 
     @Builder
     public Member(Long id, OauthProvider oauthProvider, String oauthId, String nickname) {
