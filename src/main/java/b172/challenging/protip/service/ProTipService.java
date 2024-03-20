@@ -67,31 +67,16 @@ public class ProTipService {
                 .build();
     }
 
-    public ProTipMakeResponseDto putProTip(Long memberId, ProTipRequestDto reqeustDto) {
-
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-
-        ProTip proTip =
-                ProTip.builder()
-                        .title(reqeustDto.title())
-                        .content(reqeustDto.content())
-                        .imgUrl(reqeustDto.imgUrl())
-                        .appLinkUrl(reqeustDto.appLinkUrl())
-                        .registerId(member)
-                        .useYn(reqeustDto.useYn())
-                        .build();
-        proTipRepository.save(proTip);
-
+    public ProTipMakeResponseDto putProTip(ProTipRequestDto reqeustDto) {
         return ProTipMakeResponseDto.builder()
-                .proTip(proTip)
+                .proTip(proTipRepository.save(reqeustDto.toEntity()))
                 .build();
 
     }
 
     @Transactional
     public ProTipEditResponseDto postProTip(Long proTipId, Long memberId, ProTipRequestDto requestDto) {
-        Member member = new Member(memberId);
+        Member member = memberRepository.getOrThrow(memberId);
 
         ProTip proTip = proTipRepository.findById(proTipId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_PROTIP));

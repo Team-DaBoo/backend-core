@@ -5,7 +5,7 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java/blob/main/docs/advanced-usage.md#Publishing-using-gradle
 
-name: Backend Publishing with gradle , java17 
+name: Backend Publishing with gradle , java17
 
 on:
   push:
@@ -31,18 +31,27 @@ jobs:
       with:
         java-version: '17'
         distribution: 'adopt'
-        
-        # server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        # settings-path: ${{ github.workspace }} # location for the settings.xml file
 
     # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
     - name: Make application.yml
       run: |
           cd ./src/main/resources
           # touch ./application.yml
-          echo "${{ secrets.YML }}" > ./application-security.yml
+          echo "${{ secrets.SECURITY_YML }}" > ./application-security.yml
           echo "${{ secrets.PROD_YML }}" > ./application-prod.yml
-      shell: bash	
+          echo "${{ secrets.DEV_YML }}" > ./application-dev.yml
+      shell: bash
+
+    # Gradle Caching을 통해 빌드 속도를 높입니다.
+    - name: Gradle Caching
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
 
     # gradle을 통해 소스를 빌드.
     - name: Build with Gradle
@@ -60,7 +69,7 @@ jobs:
            docker push ${{ secrets.DOCKER_REPO }}/bside-17-2-back
 
     # appleboy/ssh-action@master 액션을 사용하여 지정한 서버에 ssh로 접속하고, script를 실행합니다.
-    # script의 내용은 도커의 기존 프로세스들을 제거하고, docker repo로부터 방금 위에서 push한 내용을 pull 받아 실행하는 것입니다. 
+    # script의 내용은 도커의 기존 프로세스들을 제거하고, docker repo로부터 방금 위에서 push한 내용을 pull 받아 실행하는 것입니다.
     # 실행 시, docker-compose를 사용합니다.
     - name: Deploy to Development Server
       uses: appleboy/ssh-action@master

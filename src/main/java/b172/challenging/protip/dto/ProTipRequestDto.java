@@ -1,6 +1,7 @@
 package b172.challenging.protip.dto;
 
 import b172.challenging.common.domain.UseYn;
+import b172.challenging.protip.domain.ProTip;
 import b172.challenging.protip.domain.ProTipType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
@@ -30,4 +31,14 @@ public record ProTipRequestDto(
         @Schema(description = "사용 여부")
         UseYn useYn
 
-){ }
+){
+        public ProTip toEntity(){
+                return ProTip.builder()
+                        .title(title)
+                        .content(content)
+                        .imgUrl(imgUrl)
+                        .appLinkUrl(appLinkUrl)
+                        .useYn(useYn)
+                        .build();
+        }
+}

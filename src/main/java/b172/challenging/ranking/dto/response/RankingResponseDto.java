@@ -4,8 +4,9 @@ import lombok.Builder;
 
 @Builder
 public record RankingResponseDto(
-        Long totalAmount,
+        Long rank,
         Long memberId,
         String nickname,
+        Long totalAmount,
         Long homeLevel
 ) { }

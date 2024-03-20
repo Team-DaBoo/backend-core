@@ -10,7 +10,7 @@ public enum ActivityType {
     REWARD_POINT("포인트 지급", CERTIFICATE),
 
 
-    GIVE_MATERIAL("자재 구입",MYHOME),
+    GIVE_MATERIAL("자재 지급",MYHOME),
     BUY_MATERIAL("자재 구입",MYHOME),
     USE_MATERIAL("자재 사용",MYHOME),
 
@@ -18,7 +18,7 @@ public enum ActivityType {
     LOSE_BADGE("배지 상실",BADGE),
 
 
-    ;
+    CHANGE_NICKNAME("닉네임 변경", MEMBER),;
 
     private final String description;
     private final ActivityCategory parentCategory;

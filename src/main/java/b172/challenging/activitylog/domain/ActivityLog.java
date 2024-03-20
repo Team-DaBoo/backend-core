@@ -27,6 +27,11 @@ public class ActivityLog extends BaseTimeEntity {
     @Schema(description = "유저 ID")
     private Member member;
 
+    @ManyToOne
+    @JoinColumn(name = "modifier_id", nullable = false)
+    @Schema(description = "수정한 사람 ID")
+    private Member modifier;
+
     @Column(name = "activity_category", nullable = false, length = 128)
     @Enumerated(EnumType.STRING)
     @Schema(description = "활동 카테고리")
@@ -41,9 +46,10 @@ public class ActivityLog extends BaseTimeEntity {
     @Schema(description = "설명")
     private String description;
 
-    public static ActivityLog createActivityLog(Member member, ActivityType activityType, String description) {
+    public static ActivityLog createActivityLog(Member member, Member modifier, ActivityType activityType, String description) {
         return ActivityLog.builder()
                 .member(member)
+                .modifier(modifier)
                 .activityCategory(activityType.getParentCategory())
                 .activityType(activityType)
                 .description(description)

@@ -1,6 +1,5 @@
 package b172.challenging.gathering.service;
 
-import b172.challenging.activitylog.domain.ActivityCategory;
 import b172.challenging.activitylog.domain.ActivityLog;
 import b172.challenging.activitylog.domain.ActivityType;
 import b172.challenging.activitylog.event.ActivityLogEvent;
@@ -91,6 +90,7 @@ public class GatheringSavingLogService {
 
         ActivityLog activityLog = ActivityLog.createActivityLog(
                 new Member(memberId),
+                new Member(memberId),
                 ActivityType.CERTIFICATE_MONEY,
                 gatheringSavingLogRequestDto.amount() + " 원 인증"
         );
@@ -122,6 +122,7 @@ public class GatheringSavingLogService {
         gatheringSavingCertification.setImageUrl(imgUrl);
 
         ActivityLog activityLog = ActivityLog.createActivityLog(
+                new Member(memberId),
                 new Member(memberId),
                 ActivityType.CERTIFICATE_MONEY_UPDATE,
                 gatheringSavingLogRequestDto.amount() + " 원 > " + gatheringSavingLog.getAmount() + " 원 변경"

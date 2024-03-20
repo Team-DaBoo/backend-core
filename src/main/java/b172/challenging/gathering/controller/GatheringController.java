@@ -4,7 +4,6 @@ package b172.challenging.gathering.controller;
 import b172.challenging.gathering.domain.AppTechPlatform;
 import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.gathering.domain.GatheringStatus;
-import b172.challenging.gathering.dto.GatheringMemberDto;
 import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
 import b172.challenging.gathering.dto.response.GatheringSavingLogResponseDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
@@ -125,7 +124,7 @@ public class GatheringController {
             @ApiResponse(responseCode = "201", description = "인서트 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
-    public ResponseEntity<GatheringMemberDto> joinGathering(Principal principal,
+    public ResponseEntity<GatheringMemberResponseDto> joinGathering(Principal principal,
                                                                   @PathVariable Long gatheringId){
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(gatheringService.joinGathering(memberId, gatheringId));
@@ -137,7 +136,7 @@ public class GatheringController {
             @ApiResponse(responseCode = "200", description = "업데이트 성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
-    public ResponseEntity<GatheringMemberDto> leftGathering(Principal principal,
+    public ResponseEntity<GatheringMemberResponseDto> leftGathering(Principal principal,
                                                             @PathVariable Long gatheringMemberId){
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(gatheringService.leftGathering(memberId, gatheringMemberId));

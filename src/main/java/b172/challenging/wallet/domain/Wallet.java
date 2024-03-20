@@ -5,6 +5,7 @@ import b172.challenging.myhome.domain.MyHome;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -14,6 +15,8 @@ import lombok.NoArgsConstructor;
 @Table(name = "wallet")
 @NoArgsConstructor
 @Schema(description = "사용자 포인트")
+@Builder
+@AllArgsConstructor
 public class Wallet extends BaseTimeEntity {
 
     @Id
@@ -27,7 +30,7 @@ public class Wallet extends BaseTimeEntity {
     private Member member;
 
     @Schema(description = "MyHome id")
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_id", columnDefinition = "bigint default 1") // FIXME: home 정보 추가 후 nullable=false로 변경
     private MyHome myHome;
 
@@ -47,15 +50,5 @@ public class Wallet extends BaseTimeEntity {
     public void savePoint(Long amount){
         this.saveAmount += amount;
         this.point += amount;
-    }
-
-    @Builder
-    public Wallet(Long id, String homeName, Long point, Long saveAmount, Member member, MyHome myHome) {
-        this.id = id;
-        this.homeName = homeName;
-        this.point = point;
-        this.saveAmount = saveAmount;
-        this.member = member;
-        this.myHome = myHome;
     }
 }

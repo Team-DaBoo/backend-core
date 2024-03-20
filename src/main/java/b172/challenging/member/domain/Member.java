@@ -1,16 +1,10 @@
 package b172.challenging.member.domain;
 
 import b172.challenging.common.domain.BaseTimeEntity;
-import b172.challenging.gathering.domain.GatheringMember;
-import b172.challenging.wallet.domain.MaterialWallet;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
-import java.util.List;
-
 @Entity
 @Getter
 @Table(name = "member", uniqueConstraints = {
@@ -50,16 +44,6 @@ public class Member extends BaseTimeEntity {
     @Column(length = 10)
     @Enumerated(EnumType.STRING)
     private Sex sex;
-
-    @Column(name = "leaved_at")
-    private LocalDateTime leavedAt;
-
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.ALL })
-    private List<GatheringMember> gatheringMembers;
-
-    @OneToMany(mappedBy = "member", cascade = { CascadeType.ALL })
-    private List<MaterialWallet> materialWallets;
-
     @Builder
     public Member(Long id, OauthProvider oauthProvider, String oauthId, String nickname) {
         this.id = id;

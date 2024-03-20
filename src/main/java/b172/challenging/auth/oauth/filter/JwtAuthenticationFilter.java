@@ -37,7 +37,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
     ) throws ServletException, IOException {
 
-        if(request.getServletPath().startsWith("/oauth")){
+        if(!request.getServletPath().startsWith("/v1") && !request.getServletPath().startsWith("/admin")) {
             filterChain.doFilter(request, response);
             return;
         }
@@ -86,8 +86,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throw new CustomRuntimeException(Exceptions.UNAUTHORIZED);
         }
 
+        String newAccessToken = jwtService.createAccessToken(memberId, member.getRole());
+        String newRefreshToken = jwtService.createRefreshToken(memberId);
         jwtService.sendAccessAndRefreshToken(
-                response, jwtService.createAccessToken(memberId, member.getRole()), jwtService.createRefreshToken(memberId)
+                response, newAccessToken, newRefreshToken
         );
         saveAuthentication(member);
     }

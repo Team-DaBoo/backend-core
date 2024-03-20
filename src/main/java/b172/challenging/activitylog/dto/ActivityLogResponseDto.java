@@ -1,27 +1,34 @@
 package b172.challenging.activitylog.dto;
 
-import b172.challenging.activitylog.domain.ActivityCategory;
 import b172.challenging.activitylog.domain.ActivityLog;
-import b172.challenging.activitylog.domain.ActivityType;
-import b172.challenging.member.dto.MemberDto;
+import b172.challenging.member.dto.MemberResponseDto;
+import lombok.Builder;
 
+import java.time.LocalDateTime;
+
+@Builder
 public record ActivityLogResponseDto(
         Long id,
-        MemberDto member,
-        ActivityCategory activityCategory,
-        ActivityType activityType,
-        String description
+        MemberResponseDto member,
+        MemberResponseDto modifier,
+
+        String activityCategory,
+        String activityType,
+        String description,
+        LocalDateTime createdAt
 )
 
 {
 
     public static ActivityLogResponseDto from(ActivityLog activityLog) {
-        return new ActivityLogResponseDto (
-                activityLog.getId(),
-                new MemberDto(activityLog.getMember()),
-                activityLog.getActivityCategory(),
-                activityLog.getActivityType(),
-                activityLog.getDescription()
-        );
+        return ActivityLogResponseDto.builder()
+                .id(activityLog.getId())
+                .member(MemberResponseDto.from(activityLog.getMember()))
+                .modifier(MemberResponseDto.from(activityLog.getModifier()))
+                .activityCategory(activityLog.getActivityCategory().getKey())
+                .activityType(activityLog.getActivityType().getDescription())
+                .description(activityLog.getDescription())
+                .createdAt(activityLog.getCreatedAt())
+                .build();
     }
 }

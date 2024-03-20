@@ -1,12 +1,8 @@
 package b172.challenging.activitylog.controller;
 
 import b172.challenging.activitylog.domain.ActivityCategory;
-import b172.challenging.activitylog.domain.ActivityLog;
-import b172.challenging.activitylog.domain.ActivityType;
 import b172.challenging.activitylog.dto.ActivityLogResponseDto;
-import b172.challenging.activitylog.event.ActivityLogEvent;
 import b172.challenging.activitylog.service.ActivityService;
-import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;

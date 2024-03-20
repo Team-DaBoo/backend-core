@@ -3,6 +3,7 @@ package b172.challenging.wallet.service;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
 import b172.challenging.member.domain.Member;
+import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.myhome.domain.MyHome;
 import b172.challenging.myhome.service.MyHomeService;
 import b172.challenging.wallet.domain.MaterialWallet;
@@ -26,30 +27,19 @@ public class WalletService {
 
     public WalletResponseDto findMyWallet (Long memberId){
         Optional<Wallet> optionalWallet = walletRepository.findByMemberId(memberId);
-
-        return optionalWallet.map( wallet -> WalletResponseDto.builder()
-                .id(wallet.getId())
-                .member(wallet.getMember())
-                .myHome(wallet.getMyHome())
-                .myHomeName(wallet.getHomeName())
-                .point(wallet.getPoint())
-                .saveAmount(wallet.getSaveAmount())
-                .homeUpdatedAt(wallet.getUpdatedAt())
-                .build())
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
+        if(optionalWallet.isEmpty()){
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET);
+        }
+        return WalletResponseDto.from(optionalWallet.get());
     }
 
-    public MaterialWalletResponseDto findMyMaterialWallet (Long memberId){
+    public List<MaterialWalletResponseDto> findMyMaterialWallet (Long memberId){
         List<MaterialWallet> materialWalletList = materialWalletRepository.findByMemberId(memberId);
         if(materialWalletList.isEmpty()) {
             throw new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET);
         }
 
-        return MaterialWalletResponseDto
-                .builder()
-                .materialWallet(materialWalletList)
-                .build();
-
+        return materialWalletList.stream().map(MaterialWalletResponseDto::from).toList();
     }
 
     public void createWallet(Member member) {

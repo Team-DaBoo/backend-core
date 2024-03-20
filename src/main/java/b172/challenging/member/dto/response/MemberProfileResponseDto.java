@@ -6,30 +6,29 @@ import b172.challenging.member.domain.Role;
 import b172.challenging.member.domain.Sex;
 import lombok.*;
 
-@Getter
-@RequiredArgsConstructor
-public class MemberProfileResponseDto {
+import java.time.LocalDateTime;
+@Builder
+public record MemberProfileResponseDto (
+        Long id,
+        OauthProvider oauthProvider,
+        String nickName,
+        Role role,
+        Long birthYear,
+        Sex sex,
+        String isLeaved,
+        LocalDateTime createdAt
 
-    private final Long id;
-
-    private final OauthProvider oauthProvider;
-
-    private final String nickName;
-
-    private final Role role;
-
-    private final Long birthYear;
-
-    private final Sex sex;
-
-    public static MemberProfileResponseDto of(Member member) {
+){
+    public static MemberProfileResponseDto from(Member member) {
         return new MemberProfileResponseDto(
                 member.getId(),
                 member.getOauthProvider(),
                 member.getNickname(),
                 member.getRole(),
                 member.getBirthYear(),
-                member.getSex()
+                member.getSex(),
+                member.isLeaved() ? "탈퇴" : "정상",
+                member.getCreatedAt()
         );
     }
 }

@@ -1,13 +1,11 @@
 package b172.challenging.member.controller;
 
-import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.dto.request.MemberCheckNicknameRequestDto;
 import b172.challenging.member.dto.request.MemberProfileUpdateRequestDto;
 import b172.challenging.member.dto.response.MemberCheckNicknameResponseDto;
 import b172.challenging.member.dto.response.MemberProfileResponseDto;
 import b172.challenging.member.repository.MemberRepository;
-import b172.challenging.member.service.MemberNicknameService;
 import b172.challenging.member.service.MemberService;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
@@ -47,7 +45,7 @@ public class MemberController {
         Long memberId = Long.parseLong(principal.getName());
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        return ResponseEntity.ok(MemberProfileResponseDto.of(member));
+        return ResponseEntity.ok(MemberProfileResponseDto.from(member));
     }
 
     @PutMapping("/profile")
@@ -63,7 +61,7 @@ public class MemberController {
             @RequestBody @Valid MemberProfileUpdateRequestDto memberProfileUpdateRequestDto) {
         Long memberId = Long.parseLong(principal.getName());
         Member member = memberService.updateMemberProfile(memberId, memberProfileUpdateRequestDto);
-        return ResponseEntity.ok(MemberProfileResponseDto.of(member));
+        return ResponseEntity.ok(MemberProfileResponseDto.from(member));
     }
 
     @GetMapping("/profile/nickname/check")

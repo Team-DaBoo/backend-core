@@ -56,12 +56,9 @@ public class ProTipAdminController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
     @Parameter(name = "type", description = "type : [YOUTUBE , BLOG, APP]")
-    public ResponseEntity<ProTipMakeResponseDto> putProTip(Principal principal,
-                                                           @RequestBody ProTipRequestDto reqeustDto) {
+    public ResponseEntity<ProTipMakeResponseDto> putProTip(@RequestBody ProTipRequestDto reqeustDto) {
 
-        Long memberId = Long.parseLong(principal.getName());
-
-        return ResponseEntity.ok(proTipservice.putProTip(memberId, reqeustDto));
+        return ResponseEntity.ok(proTipservice.putProTip(reqeustDto));
     }
 
     @PostMapping("/{proTipId}")

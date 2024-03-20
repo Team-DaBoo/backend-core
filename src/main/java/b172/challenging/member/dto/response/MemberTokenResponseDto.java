@@ -11,4 +11,5 @@ public record MemberTokenResponseDto(
     String oauthId,
     String accessToken,
     String refreshToken
-) { }
+) {
+}

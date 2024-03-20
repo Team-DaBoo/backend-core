@@ -1,10 +1,8 @@
 package b172.challenging.gathering.service;
 
-import b172.challenging.gathering.dto.GatheringDto;
-import b172.challenging.gathering.dto.GatheringMemberDto;
+import b172.challenging.gathering.dto.response.GatheringResponseDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
 import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
-import b172.challenging.gathering.repository.GatheringImageRepository;
 import b172.challenging.gathering.repository.GatheringMemberCustomRepository;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.repository.MemberRepository;
@@ -23,15 +21,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
-
 @Service
 @RequiredArgsConstructor
 public class GatheringService {
     private final GatheringRepository gatheringRepository;
     private final GatheringMemberRepository gatheringMemberRepository;
     private final GatheringMemberCustomRepository gatheringMemberCustomRepository;
-    private final GatheringImageRepository gatheringImageRepository;
     private final MemberRepository memberRepository;
 
     public GatheringPageResponseDto findGathering(GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
@@ -71,7 +66,7 @@ public class GatheringService {
             throw new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER);
         }
 
-        List<GatheringDto> gatheringPageDto = gatherings.stream().map(GatheringDto::new).toList();
+        List<GatheringResponseDto> gatheringPageDto = gatherings.stream().map(GatheringResponseDto::from).toList();
 
         return GatheringPageResponseDto.builder()
                 .gatheringPages(gatheringPageDto)
@@ -82,19 +77,6 @@ public class GatheringService {
                 .lastPage(gatheringPage.isLast())
                 .build();
     }
-
-    private GatheringImage generateGatheringImage() {
-        List<GatheringImage> allImages = gatheringImageRepository.findAll();
-        if (allImages == null || allImages.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_IMAGE);
-        }
-
-        Random random = new Random();
-        int randomIndex = random.nextInt(allImages.size());
-
-        return allImages.get(randomIndex);
-    }
-
 
     @Transactional
     public GatheringMakeResponseDto makeGathering(Long memberId, GatheringMakeRequestDto gatheringMakeRequestDto) {
@@ -178,7 +160,7 @@ public class GatheringService {
     }
 
     @Transactional
-    public GatheringMemberDto joinGathering(Long memberId, Long gatheringId) {
+    public GatheringMemberResponseDto joinGathering(Long memberId, Long gatheringId) {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         Gathering gathering = gatheringRepository.findById(gatheringId)
@@ -198,18 +180,18 @@ public class GatheringService {
 
         gatheringRepository.save(gathering);
 
-        return new GatheringMemberDto(gatheringMember);
+        return GatheringMemberResponseDto.from(gatheringMember);
     }
 
     @Transactional
-    public GatheringMemberDto leftGathering(Long MemberId, Long gatheringMemberId) {
+    public GatheringMemberResponseDto leftGathering(Long MemberId, Long gatheringMemberId) {
         GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         Gathering gathering = gatheringRepository.findById(gatheringMember.getId())
                         .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
         gathering.leftGatheringMember(gatheringMember);
 
-        return new GatheringMemberDto(gatheringMember);
+        return GatheringMemberResponseDto.from(gatheringMember);
     }
 
     public Double getAchievementRate(Member member) {

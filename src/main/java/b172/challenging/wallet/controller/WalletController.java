@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.security.Principal;
+import java.util.List;
 
 @Tag(name = "월렛 API", description = "사용자 월렛(포인트, 나의 집 재료) 관련 API")
 @RestController
@@ -43,7 +44,7 @@ public class WalletController {
                     content = {@Content(schema = @Schema(implementation = MaterialWalletResponseDto.class))}),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다.")
     })
-    public ResponseEntity<MaterialWalletResponseDto> getMyMaterialWallet (Principal principal){
+    public ResponseEntity<List<MaterialWalletResponseDto>> getMyMaterialWallet (Principal principal){
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(walletService.findMyMaterialWallet(memberId));
     }

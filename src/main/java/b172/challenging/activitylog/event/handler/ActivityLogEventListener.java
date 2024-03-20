@@ -17,7 +17,6 @@ public class ActivityLogEventListener {
     @Async
     public void saveActivityLogEventHandler(ActivityLogEvent event) {
         ActivityLog activityLog = event.activityLog();
-        System.out.println(activityLog.getId());
         activityLogRepository.save(activityLog);
     }
 

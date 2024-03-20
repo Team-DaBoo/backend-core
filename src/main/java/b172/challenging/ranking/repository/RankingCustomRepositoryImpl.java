@@ -19,7 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Repository
 public class RankingCustomRepositoryImpl implements RankingCustomRepository{
@@ -65,15 +65,18 @@ public class RankingCustomRepositoryImpl implements RankingCustomRepository{
                 .limit(page.getPageSize())
                 .fetchResults();
 
-
-        List<RankingResponseDto> rankingResponseDtos = results.getResults().stream()
-                .map(tuple -> new RankingResponseDto(
-                        tuple.get(gatheringSavingLog.amount.sum()),
-                        tuple.get(member.id),
-                        tuple.get(member.nickname),
-                        tuple.get(myHome.level.max())
-                ))
-                .collect(Collectors.toList());
+        List<RankingResponseDto> rankingResponseDtos = IntStream.range(0, results.getResults().size())
+                .mapToObj(i -> {
+                    Tuple tuple = results.getResults().get(i);
+                    long rowNum = results.getOffset() + i + 1; // 행 번호 계산
+                    return RankingResponseDto.builder()
+                            .rank(rowNum)
+                            .memberId(tuple.get(0, Long.class))
+                            .nickname(tuple.get(1, String.class))
+                            .homeLevel(tuple.get(2, Long.class))
+                            .totalAmount(tuple.get(3, Long.class))
+                            .build();
+                }).toList();
         return new PageImpl<>(rankingResponseDtos, page, results.getTotal());
     }
 }
