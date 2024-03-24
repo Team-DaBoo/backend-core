@@ -42,8 +42,8 @@ public class GatheringSavingLogService {
     private final S3FileUploadUtil s3FileUploadUtil;
     private final ApplicationEventPublisher publisher;
 
-    public GatheringSavingLogResponseDto findGatheringSavingLog(Long savingLogId){
-        Gathering gathering = gatheringRepository.findById(savingLogId)
+    public GatheringSavingLogResponseDto findGatheringSavingLog(Long gatheringId){
+        Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
         List<GatheringSavingLog> gatheringSavingLogs = gatheringSavingLogRepository
                         .findAllByGatheringMember_Gathering(gathering);

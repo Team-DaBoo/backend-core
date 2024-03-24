@@ -4,10 +4,9 @@ import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.OauthProvider;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.domain.Sex;
-import lombok.*;
 
 import java.time.LocalDateTime;
-@Builder
+
 public record MemberProfileResponseDto (
         Long id,
         OauthProvider oauthProvider,

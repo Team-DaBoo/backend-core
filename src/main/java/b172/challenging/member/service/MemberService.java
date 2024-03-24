@@ -43,10 +43,10 @@ public class MemberService {
         member.setSex(memberProfileUpdateRequestDto.getSex());
         if (member.getRole() == Role.GUEST) {
             member.setRole(Role.MEMBER);
+            publisher.publishEvent(new RegisteredEvent(member));
         }
         memberRepository.save(member);
 
-        publisher.publishEvent(new RegisteredEvent(member));
         return member;
     }
 

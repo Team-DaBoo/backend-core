@@ -25,10 +25,6 @@ public class ActivityService {
                 ? activityLogRepository.findByMemberId(memberId, page)
                 : activityLogRepository.findByMemberIdAndActivityCategory(memberId,activityCategory, page);
 
-        if(activityLogPage.isEmpty()) {
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_ACTIVITY_LOG);
-        }
-
         return activityLogPage.map(ActivityLogResponseDto::from);
 
     }

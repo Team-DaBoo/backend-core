@@ -3,6 +3,7 @@ package b172.challenging.auth.oauth.handler;
 import b172.challenging.auth.oauth.CustomOauth2User;
 import b172.challenging.auth.service.CustomOauthService;
 import b172.challenging.auth.service.JwtService;
+import b172.challenging.member.domain.Role;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -35,10 +36,10 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("oauth2User.getRole() : {}", oauth2User.getRole());
         log.info("oauth2User.getMemberId() : {}", oauth2User.getMemberId());
         log.info(accessToken);
-//        if (oauth2User.getRole() == Role.GUEST) {
-//            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-//
-//        } else {jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-//        }
+        if (oauth2User.getRole() == Role.GUEST) {
+            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+
+        } else {jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        }
     }
 }

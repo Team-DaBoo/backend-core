@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <div class="activities">
+                <h1>방 관리</h1>
+                <div>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/gathering/create} + '\''">방 생성</button>
+                    </label>
+                    <table th:if="${!gatheringList.isEmpty()}">
+                        <caption>회원 관리</caption>
+                        <thead>
+                        <tr>
+                            <th>번호</th>
+                            <th>방 이름</th>
+                            <th>방장 이름</th>
+                            <th>플랫폼</th>
+                            <th>목표금액</th>
+                            <th>시작일자</th>
+                            <th>종료일자</th>
+                            <th>기간</th>
+                            <th>회원상태</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="gathering : ${gatheringList}">
+                            <td><a th:href="@{/admin/gathering/{id}(id=${gathering.id})}" th:text="${gathering.id}">2</a></td>
+                            <td th:text="${gathering.title}"/>
+                            <td th:text="${gathering.ownerMember.nickname}"/>
+                            <td th:text="${gathering.platform.toString()}"/>
+                            <td th:text="${gathering.goalAmount} + ' 원'"/>
+                            <td th:text="${#temporals.format(gathering.startDate,'yyyy-MM-dd HH:mm')}"/>
+                            <td th:text="${#temporals.format(gathering.endDate,'yyyy-MM-dd HH:mm')}"/>
+                            <td th:text="${gathering.workingDays} + ' 일'"/>
+                            <td th:text="${gathering.gatheringStatus.toString()}"/>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="left-bottom">
+                <div class="pagination" th:if="${totalElements} != 0">
+                    <div th:if="${pageNum != 0}">
+                        <a th:href="@{/admin/gathering(page=${pageNum - 1})}" class="prev">&#10094; Previous</a>
+                    </div>
+                    <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
+                        <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/gathering(page=${currPage})}" th:text="${currPage + 1}">1</a>
+                    </div>
+                    <div th:if="${pageNum != totalPage - 1}">
+                        <a th:href="@{/admin/gathering(page=${pageNum + 1})}" class="next">Next &#10095;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

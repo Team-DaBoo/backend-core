@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter
@@ -30,6 +31,9 @@ public class GatheringSavingLog {
 
     @Column(name = "certificated_at", nullable = false)
     private LocalDateTime certificatedAt;
+
+    @OneToMany(mappedBy = "gatheringSavingLog", cascade = CascadeType.ALL)
+    private List<GatheringSavingCertification> gatheringSavingCertifications;
 
     public void setAmount(Long amount){
         this.amount = amount;

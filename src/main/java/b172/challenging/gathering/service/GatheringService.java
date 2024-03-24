@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 @Service
@@ -31,10 +32,14 @@ public class GatheringService {
 
     public GatheringPageResponseDto findGathering(GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
         Page<Gathering> gatheringPage;
-        if (platform == null) {
+        if(platform == null && gatheringStatus == null){
+            gatheringPage = gatheringRepository.findAll(page);
+        } else if (platform == null) {
             gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
                     ? gatheringRepository.findByStatus(GatheringStatus.PENDING, page)
                     : gatheringRepository.findByStatusNot(GatheringStatus.PENDING, page);
+        } else if(gatheringStatus == null){
+            gatheringPage = gatheringRepository.findByPlatform(platform, page);
         } else {
             gatheringPage = gatheringStatus.equals(GatheringStatus.PENDING)
                     ? gatheringRepository.findByPlatformAndStatus(platform, GatheringStatus.PENDING, page)
@@ -69,7 +74,7 @@ public class GatheringService {
         List<GatheringResponseDto> gatheringPageDto = gatherings.stream().map(GatheringResponseDto::from).toList();
 
         return GatheringPageResponseDto.builder()
-                .gatheringPages(gatheringPageDto)
+                .gatheringList(gatheringPageDto)
                 .pageNo(page.getPageNumber())
                 .pageSize(page.getPageSize())
                 .totalElements(gatheringPage.getTotalElements())
@@ -85,16 +90,16 @@ public class GatheringService {
         Gathering gathering = Gathering.builder()
                 .ownerMember(member)
                 .platform(gatheringMakeRequestDto.appTechPlatform())
-                .gatheringImageUrl(gatheringMakeRequestDto.gatheringImageUrl())
+                .gatheringImageUrl(gatheringMakeRequestDto.gatheringImageUrl() == null ? "" : gatheringMakeRequestDto.gatheringImageUrl())
                 .title(gatheringMakeRequestDto.title())
                 .description(gatheringMakeRequestDto.description())
                 .peopleNum(gatheringMakeRequestDto.peopleNum())
                 .workingDays(gatheringMakeRequestDto.workingDays())
                 .goalAmount(gatheringMakeRequestDto.goalAmount())
                 .status(GatheringStatus.PENDING)
-                .startDate(gatheringMakeRequestDto.startDate())
+                .startDate(gatheringMakeRequestDto.startDate() == null ? LocalDateTime.now() : gatheringMakeRequestDto.startDate())
+                .endDate(gatheringMakeRequestDto.endDate() == null ? LocalDateTime.now().plusDays(gatheringMakeRequestDto.workingDays()) : gatheringMakeRequestDto.endDate())
                 .gatheringMembers(new ArrayList<>())
-                .endDate(gatheringMakeRequestDto.endDate())
                 .build();
 
         GatheringMember gatheringMember = GatheringMember.builder()
@@ -219,5 +224,17 @@ public class GatheringService {
                 .ownerGatheringCount(ownerGatheringCount)
                 .achievementRate(achievementRate)
                 .build();
+    }
+
+    public GatheringResponseDto findById(Long gatheringId) {
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
+        return GatheringResponseDto.from(gathering);
+    }
+    @Transactional
+    public void deleteGathering(Long gatheringId) {
+        Gathering gathering = gatheringRepository.findById(gatheringId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
+        gatheringRepository.delete(gathering);
     }
 }

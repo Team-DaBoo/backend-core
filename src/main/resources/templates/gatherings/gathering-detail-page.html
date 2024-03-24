@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+        <form id="actionForm" method="post">
+            <div class="left-content">
+                <div class="activities">
+                    <h1>방 상세 정보</h1>
+                    <div>
+                        <label>
+                            <button th:onclick="'window.location.href=\'' + @{/admin/gathering} + '\''">뒤로가기</button>
+                        </label>
+                        <table>
+                            <caption>방 정보</caption>
+                            <thead>
+                            <tr>
+                                <th>상태</th>
+                                <th>시작일</th>
+                                <th>방이름</th>
+                                <th>앱</th>
+                                <th>목표금액</th>
+                                <th>인원</th>
+                                <th>기간</th>
+                                <th>방장</th>
+                            </tr>
+                            </thead>
+                            <tbody th:if="${gathering != null}">
+                            <tr>
+                                <td th:text="${gathering.gatheringStatus}"/>
+                                <td th:text="${#temporals.format(gathering.startDate,'yyyy-MM-dd HH:mm')}"/>
+                                <td th:text="${gathering.title}"/>
+                                <td th:text="${gathering.platform.toString()}"/>
+                                <td th:text="${gathering.goalAmount}"/>
+                                <td th:text="${gathering.remainPeopleNum} + 명"/>
+                                <td th:text="${gathering.workingDays} + 일"/>
+                                <td th:text="${gathering.ownerMember.nickname}"/>
+                            </tr>
+                            </tbody>
+                        </table>
+                        <table>
+                            <caption>참여자</caption>
+                            <thead>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>상태</th>
+                                <th>참여일</th>
+                                <th>모은금액</th>
+                                <th>상세정보</th>
+                                <th>모은횟수</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="gatheringMember : ${gatheringMembers}">
+                                <td th:text="${gatheringMember.member.nickname}"/>
+                                <td th:text="${gatheringMember.status}"/>
+                                <td th:text="${#temporals.format(gatheringMember.createdAt,'yyyy-MM-dd HH:mm')}"/>
+                                <td th:text="${gatheringMember.amount}">
+                                    <td>
+                                        <button id="detail">
+                                            <a th:href="@{/admin/gathering/{id}/member/{memberId}(id=${gathering.id}, memberId=${gatheringMember.member.id})}">상세보기</a>
+                                        </button>
+                                    </td>
+                                </td>
+                                <td th:text="${gatheringMember.count}"/>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CSRF 토큰 필드를 추가합니다. Spring Security를 사용하는 경우 필요합니다. -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+
+            <div class="left-bottom">
+                <div class="pagination">
+                    <div>
+                        <button th:onclick="'submitFormWithAction(\'' + @{/admin/gathering/{id}/delete(id=${gathering.id})} + '\'' + ')'">삭제</button>
+                    </div>
+                    <div>
+                        <button th:type="reset">취소</button>
+                    </div>
+                    <div>
+                        <button type="submit">수정</button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </section>
+</main>
+</body>
+</html>

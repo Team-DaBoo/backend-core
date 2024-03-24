@@ -32,8 +32,6 @@ public class QMember extends EntityPathBase<Member> {
 
     public final StringPath jwtCode = createString("jwtCode");
 
-    public final DateTimePath<java.time.LocalDateTime> leavedAt = createDateTime("leavedAt", java.time.LocalDateTime.class);
-
     public final StringPath nickname = createString("nickname");
 
     public final StringPath oauthId = createString("oauthId");

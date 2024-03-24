@@ -17,6 +17,7 @@ public interface GatheringRepository extends JpaRepository<Gathering,Long> {
     Page<Gathering> findByOwnerMember_IdAndGatheringMembersStatusNot(Long memberId,GatheringMemberStatus gatheringMemberStatus, Pageable page);
 
 
+    Page<Gathering> findByPlatform(AppTechPlatform platform, Pageable page);
     Page<Gathering> findByPlatformAndStatus(AppTechPlatform platform, GatheringStatus status , Pageable page);
 
     Page<Gathering> findByPlatformAndStatusNot(AppTechPlatform platform, GatheringStatus status , Pageable page);

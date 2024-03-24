@@ -1,0 +1,37 @@
+table {
+    width: 100%;
+    height: auto;
+    border-collapse: collapse;
+    margin: 20px 0;
+}
+
+th, td {
+    text-align: center;
+    padding: 8px;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #f5f5f5;
+}
+
+caption {
+    font-size: 1.5em;
+    font-weight: bold;
+    text-align: left;
+    caption-side: top;
+    padding: 10px;
+    color: #ffffff;
+    background-color: #590b94; /* 부트스트랩 파란색 */
+    border-radius: 5px 5px 0 0; /* 상단 모서리만 둥글게 */
+    margin-bottom: 5px; /* caption과 테이블 사이의 여백 */
+}
+
+.vertical-table {
+    width: 50%;
+    border-collapse: collapse;
+}

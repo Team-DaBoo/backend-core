@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <div class="activities">
+                <h1>회원 관리</h1>
+                <div>
+                    <table th:if="${!memberList.isEmpty()}">
+                        <caption th:text="${title}">회원 관리</caption>
+                        <thead>
+                        <tr>
+                            <th>회원번호</th>
+                            <th>SNS 타입</th>
+                            <th>닉네임</th>
+                            <th>나이(년생)</th>
+                            <th>성별</th>
+                            <th>회원상태</th>
+                            <th>가입일</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="member : ${memberList}">
+                            <td><a th:href="@{/admin/member/{id}(id=${member.id})}" th:text="${member.id}">2</a></td>
+                            <td th:text="${member.oauthProvider}">구글</td>
+                            <td th:text="${member.nickName}">행복한 토끼</td>
+                            <td th:text="${member.birthYear}">1999</td>
+                            <td th:text="${member.sex}">선택안함</td>
+                            <td th:text="${member.isLeaved}">정상</td>
+                            <td th:text="${#temporals.format(member.createdAt,'yyyy-MM-dd HH:mm')}">2024-03-19</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="left-bottom">
+                <div class="pagination" th:if="${totalElements} != 0">
+                    <div th:if="${pageNum != 0}">
+                        <a th:href="@{/admin/member(page=${pageNum - 1})}" class="prev">&#10094; Previous</a>
+                    </div>
+                    <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
+                        <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/member(page=${currPage})}" th:text="${currPage + 1}">1</a>
+                    </div>
+                    <div th:if="${pageNum != totalPage - 1}">
+                        <a th:href="@{/admin/member(page=${pageNum + 1})}" class="next">Next &#10095;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDateTime;
 
@@ -24,15 +25,15 @@ public record GatheringMakeRequestDto(
         @NotBlank(message = "목표 금액을 설정 해야 합니다.")
         Long goalAmount,
 
-        @NotBlank(message = "이미지 Url을 설정 해야 합니다.")
+//        @NotBlank(message = "이미지 Url을 설정 해야 합니다.")
         String gatheringImageUrl,
 
-        @NotBlank(message = "시작 날짜를 설정 해야 합니다.")
+//        @NotBlank(message = "시작 날짜를 설정 해야 합니다.")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
         LocalDateTime startDate,
 
-        @NotBlank(message = "완료 날짜를 설정 해야 합니다.")
+//        @NotBlank(message = "완료 날짜를 설정 해야 합니다.")
         @JsonDeserialize(using = LocalDateTimeDeserializer.class)
         @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyyMMddHHmmss")
         LocalDateTime endDate

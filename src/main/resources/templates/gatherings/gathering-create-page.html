@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+            <div class="left-content">
+                <div class="activities">
+                    <h1>방 만들기</h1>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/gathering} + '\''">뒤로가기</button>
+                    </label>
+                    <form th:action="@{/admin/gathering/create}" method="post">
+                    <div>
+                        <table>
+                            <caption>방 만들기</caption>
+                            <thead>
+                            <tr>
+                                <th>방이름</th>
+                                <th>방장</th>
+                                <th>플랫폼</th>
+                                <th>목표금액</th>
+                                <th>인원</th>
+                                <th>기간</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td><input type="text" th:name="title"></td>
+                                <td><input type="text" th:name="memberId"></td>
+                                <td>
+                                    <select th:name="appTechPlatform">
+                                        <option  th:each="appTechPlatform : ${appTechPlatforms}"
+                                                 th:value="${appTechPlatform}"
+                                                 th:text="${appTechPlatform}"/>
+                                    </select>
+                                </td>
+                                <td><input type="text" th:name="goalAmount"> 원</td>
+                                <td><input type="text" th:name="peopleNum"> 명</td>
+                                <td><input type="text" th:name="workingDays"> 일</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                        <div class="pagination">
+                            <div>
+                                <button type="reset">취소</button>
+                            </div>
+                            <div>
+                                <button type="submit">만들기</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+    </section>
+</main>
+</body>
+</html>

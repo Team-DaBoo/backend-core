@@ -1,15 +1,16 @@
-package b172.challenging.gathering.dto.response;
+package b172.challenging.activitylog.dto;
 
 import lombok.Builder;
 
 import java.util.List;
 
 @Builder
-public record GatheringPageResponseDto(
-        List<GatheringResponseDto> gatheringList,
+public record ActivityLogPageResponseDto(
+        List<ActivityLogResponseDto> activityLogs,
         int pageNo,
         int pageSize,
         long totalElements,
         int totalPages,
         boolean lastPage
-) { }
+) {
+}

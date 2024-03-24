@@ -12,6 +12,8 @@ public record GatheringMemberResponseDto (
     GatheringResponseDto gathering,
     MemberResponseDto member,
     GatheringMemberStatus status,
+    Long amount,
+    int count,
     LocalDateTime createdAt,
     LocalDateTime updatedAt
 ) {
@@ -21,6 +23,8 @@ public record GatheringMemberResponseDto (
                 GatheringResponseDto.from(gatheringMember.getGathering()),
                 MemberResponseDto.from(gatheringMember.getMember()),
                 gatheringMember.getStatus(),
+                gatheringMember.getAmount(),
+                gatheringMember.getCount(),
                 gatheringMember.getCreatedAt(),
                 gatheringMember.getUpdatedAt()
         );

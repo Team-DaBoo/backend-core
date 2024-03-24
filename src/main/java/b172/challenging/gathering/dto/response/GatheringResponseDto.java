@@ -5,6 +5,8 @@ import b172.challenging.gathering.domain.Gathering;
 import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.member.dto.MemberResponseDto;
 
+import java.time.LocalDateTime;
+
 public record GatheringResponseDto (
         Long id,
         MemberResponseDto ownerMember,
@@ -12,6 +14,14 @@ public record GatheringResponseDto (
         String gatheringImageUrl,
         String title,
         GatheringStatus gatheringStatus,
+        LocalDateTime startDate,
+        LocalDateTime endDate,
+
+        Long goalAmount,
+
+        int workingDays,
+
+
         int remainPeopleNum
 ) {
 
@@ -23,6 +33,10 @@ public record GatheringResponseDto (
                 gathering.getGatheringImageUrl(),
                 gathering.getTitle(),
                 gathering.getStatus(),
+                gathering.getStartDate(),
+                gathering.getEndDate(),
+                gathering.getGoalAmount(),
+                gathering.getWorkingDays(),
                 gathering.getPeopleNum() - gathering.getParticipantsNum()
         );
     }

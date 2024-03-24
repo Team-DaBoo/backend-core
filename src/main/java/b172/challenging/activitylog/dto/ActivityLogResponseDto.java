@@ -6,7 +6,6 @@ import lombok.Builder;
 
 import java.time.LocalDateTime;
 
-@Builder
 public record ActivityLogResponseDto(
         Long id,
         MemberResponseDto member,
@@ -21,14 +20,14 @@ public record ActivityLogResponseDto(
 {
 
     public static ActivityLogResponseDto from(ActivityLog activityLog) {
-        return ActivityLogResponseDto.builder()
-                .id(activityLog.getId())
-                .member(MemberResponseDto.from(activityLog.getMember()))
-                .modifier(MemberResponseDto.from(activityLog.getModifier()))
-                .activityCategory(activityLog.getActivityCategory().getKey())
-                .activityType(activityLog.getActivityType().getDescription())
-                .description(activityLog.getDescription())
-                .createdAt(activityLog.getCreatedAt())
-                .build();
+        return new ActivityLogResponseDto(
+                activityLog.getId(),
+                MemberResponseDto.from(activityLog.getMember()),
+                MemberResponseDto.from(activityLog.getModifier()),
+                activityLog.getActivityCategory().getKey(),
+                activityLog.getActivityType().getDescription(),
+                activityLog.getDescription(),
+                activityLog.getCreatedAt()
+        );
     }
 }

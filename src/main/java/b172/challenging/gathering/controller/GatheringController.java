@@ -48,7 +48,7 @@ public class GatheringController {
     })
     @Parameter(name = "status", description = "status : [PENDING] or [ONGOING, COMPLETED]", example = "TOSS")
     @Parameter(name = "platform", description = "platform : [TOSS, CASH_WORK, MONIMO, BALSO]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable GatheringStatus status,
+    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable(required = false) GatheringStatus status,
                                                                  @PathVariable(required = false) AppTechPlatform platform,
                                                                  @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(gatheringService.findGathering(status, platform,  page));

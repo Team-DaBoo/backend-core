@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <h1 th:text="${title_activity_log}">이력</h1>
+            <label>
+                <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}(id=${member_id})} + '\''">뒤로가기</button>
+                <select id="activityCategory" onchange="window.location.href=this.value">
+                    <option th:value="@{/admin/member/{id}/activity-log(id=${member_id})}">ALL</option>
+                    <option th:each="category : ${activity_category}"
+                            th:value="@{/admin/member/{id}/activity-log(id=${member_id},activityCategory=${category})}"
+                            th:text="${category}"
+                            th:selected="${category eq activity_curr_category}"/>
+                </select>
+            </label>
+            <table>
+                <thead>
+                <tr>
+                    <th>일시</th>
+                    <th>분류</th>
+                    <th>항목</th>
+                    <th>변경자</th>
+                    <th>변경사항</th>
+                </tr>
+                </thead>
+                <tbody th:if="${!activityLogs.isEmpty()}">
+                <tr th:each="activityLog : ${activityLogs}">
+                    <td th:text="${#temporals.format(activityLog.createdAt,'yyyy-MM-dd HH:mm')}"/>
+                    <td th:text="${activityLog.activityCategory}"/>
+                    <td th:text="${activityLog.activityType}"/>
+                    <td th:text="${activityLog.member.nickname}"/>
+                    <td th:text="${activityLog.description}"/>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="left-bottom">
+            <div class="pagination" th:if="${totalElements} != 0">
+                <div th:if="${pageNum != 0}">
+                    <a th:href="@{/admin/member/{id}/activity-log(id=${member_id},activityCategory=${activity_curr_category})}" class="prev">&#10094; Previous</a>
+                </div>
+                <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
+                    <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/member/{id}/activity-log(id=${member_id},activityCategory=${activity_curr_category})}" th:text="${currPage + 1}">1</a>
+                </div>
+                <div th:if="${pageNum != totalPage - 1}">
+                    <a th:href="@{/admin/member/{id}/activity-log(id=${member_id},activityCategory=${activity_curr_category})}" class="next">Next &#10095;</a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>
