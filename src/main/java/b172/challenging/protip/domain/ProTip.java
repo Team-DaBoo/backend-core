@@ -11,13 +11,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Entity
 @Getter
 @Table(name = "pro_tip",
         indexes = {
-            @Index(name = "idx_pro_tip_type", columnList ="type")
+            @Index(name = "idx_pro_tip_type", columnList ="proTipType")
         })
 @NoArgsConstructor
 @AllArgsConstructor
@@ -32,7 +30,8 @@ public class ProTip extends BaseTimeEntity {
 
     @Column(nullable = false)
     @Schema(description = "분류")
-    private ProTipType type;
+    @Enumerated(EnumType.STRING)
+    private ProTipType proTipType;
 
     @Column(nullable = false)
     @Schema(description = "제목")
@@ -40,11 +39,13 @@ public class ProTip extends BaseTimeEntity {
 
     @Column
     @Schema(description = "내용")
+    @Lob
     private String content;
 
     @Column(name = "img_url")
     @Schema(description = "이미지 url")
     private String imgUrl;
+
 
     @Column(name = "app_link_url")
     @Schema(description = "앱 링크")
@@ -57,11 +58,12 @@ public class ProTip extends BaseTimeEntity {
 
     @Column(name = "use_yn" ,nullable = false)
     @Schema(description = "사용 여부")
+    @Enumerated(EnumType.STRING)
     private UseYn useYn;
 
     public void setContent(Member member, ProTipRequestDto requestDto){
         this.registerId = member;
-        this.type = requestDto.proTipType();
+        this.proTipType = requestDto.proTipType();
         this.title = requestDto.title();
         this.content = requestDto.content();
         this.imgUrl = requestDto.imgUrl();

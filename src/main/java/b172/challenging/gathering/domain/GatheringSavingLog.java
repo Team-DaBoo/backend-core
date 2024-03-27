@@ -36,9 +36,14 @@ public class GatheringSavingLog {
     private List<GatheringSavingCertification> gatheringSavingCertifications;
 
     public void setAmount(Long amount){
+        gatheringMember.setAmount(gatheringMember.getAmount() - this.amount + amount);
         this.amount = amount;
     }
 
+    @PreRemove
+    public void removeGatheringMemberAmount(){
+        gatheringMember.setAmount(gatheringMember.getAmount() - this.amount  < 0 ? 0 : gatheringMember.getAmount() - this.amount);
+    }
     public void setGatheringMember(GatheringMember gatheringMember){
         this.gatheringMember = gatheringMember;
     }

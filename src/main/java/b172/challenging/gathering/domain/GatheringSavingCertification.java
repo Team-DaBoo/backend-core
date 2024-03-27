@@ -1,12 +1,11 @@
 package b172.challenging.gathering.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -14,7 +13,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GatheringSavingCertification {
+public class GatheringSavingCertification extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,16 +24,8 @@ public class GatheringSavingCertification {
     @JoinColumn(name = "gathering_saving_log_id", nullable = false)
     private GatheringSavingLog gatheringSavingLog;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url")
     private String imageUrl;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     public void setImageUrl(String imageUrl){
         this.imageUrl = imageUrl;

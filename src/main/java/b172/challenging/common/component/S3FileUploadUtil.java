@@ -34,8 +34,8 @@ public class S3FileUploadUtil {
     }
 
     public String fileUpload(MultipartFile file, String imgUrl){
-        if(file.isEmpty()){
-            if(imgUrl.isBlank()){
+        if(file == null || file.isEmpty()){
+            if(imgUrl != null && imgUrl.isBlank()){
                 throw new CustomRuntimeException(Exceptions.INVALID_REQUEST);
             } else {
                 return imgUrl;

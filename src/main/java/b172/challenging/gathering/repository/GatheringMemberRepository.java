@@ -18,4 +18,8 @@ public interface GatheringMemberRepository extends JpaRepository<GatheringMember
     Long countByMemberIdAndStatus(Long memberId, GatheringMemberStatus gatheringMemberStatus);
 
     List<GatheringMember> findByGatheringId(Long gatheringId);
+    List<GatheringMember> findByGathering(Gathering gathering);
+
+    Optional<GatheringMember> findByGatheringIdAndMemberId(Long gatheringId, Long memberId);
+    List<GatheringMember> findByGatheringIdAndMemberIdNot(Long gatheringId, Long memberId);
 }

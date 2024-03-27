@@ -5,7 +5,6 @@ import b172.challenging.gathering.domain.AppTechPlatform;
 import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
-import b172.challenging.gathering.dto.response.GatheringSavingLogResponseDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
 import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
 import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
@@ -142,14 +141,26 @@ public class GatheringController {
         return ResponseEntity.ok(gatheringService.leftGathering(memberId, gatheringMemberId));
     }
 
-    @GetMapping("/saving-log/{gatheringId}")
-    @Operation(summary = "인증 현황", description = "인증된 내역을 가지고 옵니다.")
+    @GetMapping("/saving-log/{gatheringId}/my/{memberId}")
+    @Operation(summary = "나의 인증 현황", description = "나의 인증된 내역을 가지고 옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
-    public ResponseEntity<GatheringSavingLogResponseDto> getGatheringSavingLog(@PathVariable Long gatheringId) {
-        return ResponseEntity.ok(gatheringSavingLogService.findGatheringSavingLog(gatheringId));
+    public ResponseEntity<GatheringMemberResponseDto> findMyGatheringSavingLog(@PathVariable Long gatheringId,
+                                                                             @PathVariable Long memberId){
+        return ResponseEntity.ok(gatheringSavingLogService.findMyGatheringSavingLog(gatheringId, memberId));
+    }
+
+    @GetMapping("/saving-log/{gatheringId}/other/{memberId}")
+    @Operation(summary = "다른 참가자 인증 현황", description = "다른 참가자의 인증 내역을 가지고 옵니다.")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+    })
+    public ResponseEntity<GatheringOtherMemberResponseDto> findOtherMemberGatheringSavingLog(@PathVariable Long gatheringId,
+                                                                             @PathVariable Long memberId){
+        return ResponseEntity.ok(gatheringSavingLogService.findOtherMemberGatheringSavingLog(gatheringId, memberId));
     }
 
     @PutMapping(value = "/saving-log/{gatheringMemberId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})

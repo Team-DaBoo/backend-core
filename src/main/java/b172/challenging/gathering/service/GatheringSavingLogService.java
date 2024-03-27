@@ -6,15 +6,12 @@ import b172.challenging.activitylog.event.ActivityLogEvent;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
 import b172.challenging.common.component.S3FileUploadUtil;
-import b172.challenging.gathering.domain.Gathering;
 import b172.challenging.gathering.domain.GatheringMember;
 import b172.challenging.gathering.domain.GatheringSavingCertification;
 import b172.challenging.gathering.domain.GatheringSavingLog;
-import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
-import b172.challenging.gathering.dto.response.GatheringSavingLogResponseDto;
+import b172.challenging.gathering.dto.response.*;
 import b172.challenging.gathering.dto.request.GatheringSavingLogRequestDto;
 import b172.challenging.gathering.repository.GatheringMemberRepository;
-import b172.challenging.gathering.repository.GatheringRepository;
 import b172.challenging.gathering.repository.GatheringSavingCertificationRepository;
 import b172.challenging.gathering.repository.GatheringSavingLogRepository;
 
@@ -29,11 +26,13 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+import static java.util.stream.Collectors.collectingAndThen;
+import static java.util.stream.Collectors.toList;
+
 
 @Service
 @RequiredArgsConstructor
 public class GatheringSavingLogService {
-    private final GatheringRepository gatheringRepository;
     private final GatheringMemberRepository gatheringMemberRepository;
     private final GatheringSavingLogRepository gatheringSavingLogRepository;
     private final GatheringSavingCertificationRepository gatheringSavingCertificationRepository;
@@ -42,24 +41,12 @@ public class GatheringSavingLogService {
     private final S3FileUploadUtil s3FileUploadUtil;
     private final ApplicationEventPublisher publisher;
 
-    public GatheringSavingLogResponseDto findGatheringSavingLog(Long gatheringId){
-        Gathering gathering = gatheringRepository.findById(gatheringId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
-        List<GatheringSavingLog> gatheringSavingLogs = gatheringSavingLogRepository
-                        .findAllByGatheringMember_Gathering(gathering);
+    public GatheringMemberResponseDto findMyGatheringSavingLog(Long gatheringId, Long memberId){
 
-        if(gatheringSavingLogs.isEmpty()){
-            throw new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING_SAVING_LOG);
-        }
+        GatheringMember gatheringMember = gatheringMemberRepository.findByGatheringIdAndMemberId(gatheringId, memberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING_MEMBER));
 
-        List<GatheringMember> gatheringMembers =
-                gatheringSavingLogs.stream()
-                        .map(GatheringSavingLog::getGatheringMember)
-                        .toList();
-
-        return GatheringSavingLogResponseDto.builder()
-                .gatheringMemberList(gatheringMembers)
-                .build();
+        return GatheringMemberResponseDto.from(gatheringMember);
     }
 
     public GatheringSavingLogCertificateResponseDto saveGatheringSavingLog(Long memberId, Long gatheringMemberId, GatheringSavingLogRequestDto gatheringSavingLogRequestDto) {
@@ -96,10 +83,7 @@ public class GatheringSavingLogService {
         );
         publisher.publishEvent(new ActivityLogEvent(activityLog));
 
-        return GatheringSavingLogCertificateResponseDto.builder()
-                .amount(gatheringSavingLogRequestDto.amount())
-                .imgUrl(imgUrl)
-                .build();
+        return GatheringSavingLogCertificateResponseDto.from(gatheringSavingLogRequestDto.amount(), imgUrl);
     }
 
     @Transactional
@@ -108,18 +92,10 @@ public class GatheringSavingLogService {
         String imgUrl = s3FileUploadUtil.fileUpload(gatheringSavingLogRequestDto.file(), gatheringSavingLogRequestDto.imgUrl());
 
         GatheringSavingLog gatheringSavingLog = gatheringSavingLogRepository.findById(savingLogId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-
-        gatheringSavingLog.setAmount(gatheringSavingLogRequestDto.amount());
-
         Wallet wallet = walletRepository.findByMemberId(memberId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
-        wallet.savePoint(gatheringSavingLogRequestDto.amount() - gatheringSavingLog.getAmount() + gatheringSavingLogRequestDto.amount());
 
-        GatheringSavingCertification gatheringSavingCertification =
-                gatheringSavingCertificationRepository
-                        .findByGatheringSavingLog(gatheringSavingLog)
-                        .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        gatheringSavingCertification.setImageUrl(imgUrl);
+        wallet.savePoint(gatheringSavingLogRequestDto.amount() - gatheringSavingLog.getAmount());
 
         ActivityLog activityLog = ActivityLog.createActivityLog(
                 new Member(memberId),
@@ -129,9 +105,42 @@ public class GatheringSavingLogService {
         );
         publisher.publishEvent(new ActivityLogEvent(activityLog));
 
-        return GatheringSavingLogCertificateResponseDto.builder()
-                .amount(gatheringSavingLogRequestDto.amount())
-                .imgUrl(imgUrl)
-                .build();
+        gatheringSavingLog.setAmount(gatheringSavingLogRequestDto.amount());
+
+        GatheringSavingCertification gatheringSavingCertification =
+                gatheringSavingCertificationRepository
+                        .findByGatheringSavingLog(gatheringSavingLog)
+                        .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+        gatheringSavingCertification.setImageUrl(imgUrl);
+
+        return GatheringSavingLogCertificateResponseDto.from(gatheringSavingLogRequestDto.amount(), imgUrl);
+    }
+
+    public GatheringOtherMemberResponseDto findOtherMemberGatheringSavingLog(Long gatheringId, Long memberId) {
+        List<GatheringMember> gatheringMemberList = gatheringMemberRepository.findByGatheringIdAndMemberIdNot(gatheringId, memberId);
+
+        if(gatheringMemberList.isEmpty()){
+            throw new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING_MEMBER);
+        }
+
+        return gatheringMemberList.stream().map(GatheringOtherMemberResponseDto.OtherMemberResponseDto::from).collect(
+                collectingAndThen(
+                        toList(),
+                        GatheringOtherMemberResponseDto::new
+                )
+        );
+    }
+
+    public void deleteGatheringSavingLog(Long memberId, Long gatheringSavingLogId) {
+        GatheringSavingLog gatheringSavingLog = gatheringSavingLogRepository.findById(gatheringSavingLogId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+
+        Wallet wallet = walletRepository.findByMemberId(memberId)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_WALLET));
+
+        wallet.savePoint(-gatheringSavingLog.getAmount());
+        walletRepository.save(wallet);
+
+        gatheringSavingLogRepository.delete(gatheringSavingLog);
     }
 }

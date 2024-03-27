@@ -83,8 +83,10 @@ public class Gathering extends BaseTimeEntity {
     }
 
     public void leftGatheringMember(GatheringMember gatheringMember){
-        this.gatheringMembers.remove(gatheringMember);
+        gatheringMembers.remove(gatheringMember);
+        gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
+        this.participantsNum = this.participantsNum - 1 < 0 ? 0 : --this.participantsNum;
+        gatheringMembers.add(gatheringMember);
         gatheringMember.setGathering(this);
-        this.participantsNum--;
     }
 }

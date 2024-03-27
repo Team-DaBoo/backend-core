@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -62,5 +61,9 @@ public class GatheringMember extends BaseTimeEntity {
     public void addSavingLog(GatheringSavingLog gatheringSavingLog){
         gatheringSavingLogs.add(gatheringSavingLog);
         gatheringSavingLog.setGatheringMember(this);
+    }
+
+    public void setAmount(Long amount){
+        this.amount = amount;
     }
 }

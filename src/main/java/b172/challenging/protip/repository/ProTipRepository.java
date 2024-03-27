@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ProTipRepository extends JpaRepository<ProTip,Long> {
     Page<ProTip> findByUseYnIs(UseYn useYn, Pageable page);
 
-    Page<ProTip> findByTypeAndUseYnIs(ProTipType type, UseYn useYn, Pageable page);
+    Page<ProTip> findByProTipTypeAndUseYnIs(ProTipType proTipType, UseYn useYn, Pageable page);
 
-    Page<ProTip> findByType(ProTipType type, Pageable page);
+    Page<ProTip> findByProTipType(ProTipType proTipType, Pageable page);
 }

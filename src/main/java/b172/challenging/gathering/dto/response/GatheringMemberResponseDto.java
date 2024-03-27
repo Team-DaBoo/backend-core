@@ -5,28 +5,31 @@ import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.member.dto.MemberResponseDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 
 public record GatheringMemberResponseDto (
     Long id,
-    GatheringResponseDto gathering,
     MemberResponseDto member,
     GatheringMemberStatus status,
     Long amount,
     int count,
     LocalDateTime createdAt,
-    LocalDateTime updatedAt
+    LocalDateTime updatedAt,
+    List<GatheringSavingLogResponseDto> gatheringSavingLogResponseDtoList,
+    long gatheringSavingLogResponseDtoListSize
 ) {
     public static GatheringMemberResponseDto from(GatheringMember gatheringMember){
         return new GatheringMemberResponseDto(
                 gatheringMember.getId(),
-                GatheringResponseDto.from(gatheringMember.getGathering()),
                 MemberResponseDto.from(gatheringMember.getMember()),
                 gatheringMember.getStatus(),
                 gatheringMember.getAmount(),
                 gatheringMember.getCount(),
                 gatheringMember.getCreatedAt(),
-                gatheringMember.getUpdatedAt()
+                gatheringMember.getUpdatedAt(),
+                gatheringMember.getGatheringSavingLogs().stream().map(GatheringSavingLogResponseDto::from).toList(),
+                gatheringMember.getGatheringSavingLogs().size()
         );
     }
 }

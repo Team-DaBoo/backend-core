@@ -170,18 +170,14 @@ public class GatheringService {
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
         Gathering gathering = gatheringRepository.findById(gatheringId)
                 .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING));
-        GatheringMember gatheringMember = gatheringMemberRepository.findByMember(member)
-                .orElse(GatheringMember.builder()
-                        .member(member)
-                        .gathering(gathering)
-                        .amount(0L)
-                        .count(0)
-                        .build()
-                );
+        GatheringMember gatheringMember = GatheringMember.builder()
+                .member(member)
+                .gathering(gathering)
+                .amount(0L)
+                .count(0)
+                .build();
         gatheringMember.setStatus(GatheringMemberStatus.ONGOING);
         gathering.addGatheringMember(gatheringMember);
-
-
 
         gatheringRepository.save(gathering);
 
@@ -190,10 +186,8 @@ public class GatheringService {
 
     @Transactional
     public GatheringMemberResponseDto leftGathering(Long MemberId, Long gatheringMemberId) {
-        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        Gathering gathering = gatheringRepository.findById(gatheringMember.getId())
-                        .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
-        gatheringMember.setStatus(GatheringMemberStatus.PARTIALLY_LEFT);
+        GatheringMember gatheringMember = gatheringMemberRepository.findByIdAndMemberId(gatheringMemberId, MemberId).orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_GATHERING_MEMBER));
+        Gathering gathering = gatheringMember.getGathering();
         gathering.leftGatheringMember(gatheringMember);
 
         return GatheringMemberResponseDto.from(gatheringMember);

@@ -8,8 +8,6 @@ import b172.challenging.common.exception.Exceptions;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.protip.domain.ProTip;
 import b172.challenging.protip.domain.ProTipType;
-import b172.challenging.protip.dto.ProTipEditResponseDto;
-import b172.challenging.protip.dto.ProTipMakeResponseDto;
 import b172.challenging.protip.dto.ProTipRequestDto;
 import b172.challenging.protip.dto.ProTipResponseDto;
 import b172.challenging.protip.repository.ProTipRepository;
@@ -48,11 +46,11 @@ public class ProTipService {
                 .build();
     }
 
-    public ProTipResponseDto findProTipByType(Role role, ProTipType type, Pageable page) {
+    public ProTipResponseDto findProTipByType(Role role, ProTipType proTipType, Pageable page) {
         Page<ProTip> proTipPage =
                 role.equals(Role.ADMIN)
-                    ? proTipRepository.findByType(type, page)
-                    : proTipRepository.findByTypeAndUseYnIs(type, UseYn.Y, page);
+                    ? proTipRepository.findByProTipType(proTipType, page)
+                    : proTipRepository.findByProTipTypeAndUseYnIs(proTipType, UseYn.Y, page);
 
         List<ProTip> proTipList = new ArrayList<>(proTipPage.getContent());
 
@@ -67,15 +65,8 @@ public class ProTipService {
                 .build();
     }
 
-    public ProTipMakeResponseDto putProTip(ProTipRequestDto reqeustDto) {
-        return ProTipMakeResponseDto.builder()
-                .proTip(proTipRepository.save(reqeustDto.toEntity()))
-                .build();
-
-    }
-
     @Transactional
-    public ProTipEditResponseDto postProTip(Long proTipId, Long memberId, ProTipRequestDto requestDto) {
+    public void postProTip(Long proTipId, Long memberId, ProTipRequestDto requestDto) {
         Member member = memberRepository.getOrThrow(memberId);
 
         ProTip proTip = proTipRepository.findById(proTipId)
@@ -83,8 +74,25 @@ public class ProTipService {
 
         proTip.setContent(member, requestDto);
 
-        return ProTipEditResponseDto.builder()
-                .proTip(proTip)
-                .build();
+        proTipRepository.save(proTip);
+    }
+
+    public void createProTip(Long memberId, ProTipRequestDto requestDto) {
+        Member member = memberRepository.getOrThrow(memberId);
+
+        ProTip proTip = new ProTip();
+        proTip.setContent(member, requestDto);
+
+        proTipRepository.save(proTip);
+    }
+
+    public ProTip findProTipById(Long id) {
+        return proTipRepository.findById(id)
+                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_PROTIP));
+    }
+
+    @Transactional
+    public void deleteProTip(Long id) {
+        proTipRepository.deleteById(id);
     }
 }

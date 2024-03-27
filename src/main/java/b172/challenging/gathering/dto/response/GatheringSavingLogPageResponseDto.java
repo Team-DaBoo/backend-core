@@ -3,8 +3,8 @@ package b172.challenging.gathering.dto.response;
 
 import java.util.List;
 
-public record GatheringMemberPageResponseDto(
-        List<GatheringMemberResponseDto> gatheringMemberList,
+public record GatheringSavingLogPageResponseDto(
+        List<GatheringSavingLogResponseDto> gatheringSavingLogResponseDtoList,
         int pageNo,
         int pageSize,
         long totalElements,
