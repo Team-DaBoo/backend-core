@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+            <div class="left-content">
+                <div class="activities">
+                    <h1>인증 정보 보기</h1>
+                    <div>
+                        <label>
+                            <button th:onclick="'window.location.href=\'' + @{/admin/gathering/{id}(id=${gatheringId})} + '\''">뒤로가기</button>
+                        </label>
+                        <table>
+                            <caption>인증자 정보</caption>
+                            <thead>
+                            <tr>
+                                <th>닉네임</th>
+                                <th>총 인증 금액</th>
+                                <th>총 인증 횟수</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr>
+                                <td th:text="${member.nickname}"/>
+                                <td th:text="${amount}"/>
+                                <td th:text="${count}"/>
+                            </tr>
+                            </tbody>
+                        </table>
+
+                        <table>
+                            <caption>인증 정보</caption>
+                            <thead>
+                            <tr>
+                                <th>인증 번호</th>
+                                <th>인증 날짜</th>
+                                <th>이미지</th>
+                                <th>인증 금액</th>
+                                <th>삭제</th>
+                                <th>수정</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <form id="actionForm" method="post">
+                                    <tr th:if="${!gatheringSavingLogList.isEmpty()}" th:each="gatheringSavingLog : ${gatheringSavingLogList}">
+
+                                            <td th:text="${gatheringSavingLog.id}"/>
+                                            <td th:text="${#temporals.format(gatheringSavingLog.certificatedAt,'yyyy-MM-dd HH:mm')}"/>
+                                            <td>
+                                                <img th:each="gatheringSavingCertification : ${gatheringSavingLog.gatheringSavingCertificationResponseDtoList}" th:src="${gatheringSavingCertification.imageUrl}"/>
+                                            </td>
+                                            <td><input th:type="text" th:name="amount" th:value="${gatheringSavingLog.amount}"></td>
+                                            <td><button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/gathering/saving-log/{id}/edit/{memberId}(id=${gatheringSavingLog.id},memberId=${member.id})} + '\'' + ')'">수정</button></td>
+                                            <td><button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/gathering/saving-log/{id}/delete/{memberId}(id=${gatheringSavingLog.id},memberId=${member.id})} + '\'' + ')'">삭제</button></td>
+                                            <input type="hidden" th:name="gatheringId" th:value="${gatheringId}" />
+                                    </tr>
+                                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                                </form>
+                            </tbody>
+                        </table>
+                        <div class="pagination" th:if="${totalElements} != 0">
+                            <div th:if="${pageNum != 0}">
+                                <a th:href="@{/admin/gathering/{gatheringId}/member/{memberId}(gatheringId=${gatheringId},memberId=${member.id},page=${pageNum - 1})}" class="prev">&#10094; Previous</a>
+                            </div>
+                            <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
+                                <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/gathering/{gatheringId}/member/{memberId}(gatheringId=${gatheringId},memberId=${member.id},page=${currPage})}" th:text="${currPage + 1}">1</a>
+                            </div>
+                            <div th:if="${pageNum != totalPage - 1}">
+                                <a th:href="@{/admin/gathering/{gatheringId}/member/{memberId}(gatheringId=${gatheringId},memberId=${member.id},page=${pageNum + 1})}" class="next">Next &#10095;</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </section>
+</main>
+</body>
+</html>

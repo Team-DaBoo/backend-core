@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+        <div class="left-content">
+            <div class="activities">
+                <h1>꿀팁 등록</h1>
+
+                <div>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/pro-tips} + '\''">뒤로 가기</button>
+                    </label>
+                    <form id="actionForm" method="post">
+                        <table>
+                            <caption>회원 관리</caption>
+                        </table>
+                        <div>
+                            <label th:for="title">제목 : &nbsp;&nbsp;</label>
+                            <input th:type="text" th:id="title" th:name="title"/>
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <div th:text="'내용'"/>
+                            <br>
+                            <textarea th:id="editor" th:class="editor" th:name="content"></textarea>
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <label th:for="proTipType">컨텐츠 타입 : &nbsp;&nbsp;</label>
+                            <select th:name="proTipType">
+                                <option  th:each="proTipType : ${proTipTypes}"
+                                         th:value="${proTipType}"
+                                         th:text="${proTipType}"
+                                />
+                            </select>
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <label th:for="imgUrl">이미지 URL : &nbsp;&nbsp;</label>
+                            <input th:type="text" th:id="imgUrl" th:name="imgUrl" />
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <label th:for="appLinkUrl">앱 URL : &nbsp;&nbsp;</label>
+                            <input th:type="text" th:id="appLinkUrl" th:name="appLinkUrl" />
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <label>사용 여부:&nbsp;&nbsp;&nbsp;</label>
+                            <input type="radio" id="useY" name="useYn" th:value="Y" th:checked=true/>
+                            <label for="useY">사용</label>
+                            <input type="radio" id="useN" name="useYn" th:value="N" />
+                            <label for="useN">미사용</label>
+                        </div>
+                        <br><hr><br>
+                        <div class="pagination">
+                            <div>
+                                <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/pro-tips/create} + '\'' + ')'">등록</button>
+                            </div>
+                            <div></div>
+                            <div>
+                                <button th:type="reset">취소</button>
+                            </div>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
+<script th:inline="javascript">
+    ClassicEditor
+        .create(document.querySelector('.editor'))
+        .then(editor => {
+            window.editor = editor.setData(contentData);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+</html>

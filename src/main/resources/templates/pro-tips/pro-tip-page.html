@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+        <div class="left-content">
+            <div class="activities">
+                <h1>꿀팁 관리</h1>
+                <div>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/pro-tips/create} + '\''">꿀팁 생성</button>
+                    </label>
+                    <table>
+                        <caption>회원 관리</caption>
+                        <thead>
+                        <tr>
+                            <th>번호</th>
+                            <th>컨텐츠타입</th>
+                            <th>제목</th>
+                            <th>등록자</th>
+                            <th>등록일 (최종 수정일)</th>
+                            <th>사용여부</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${!proTipList.isEmpty()}" th:each="proTip : ${proTipList}">
+                            <td><a th:href="@{/admin/pro-tips/{id}(id=${proTip.id})}" th:text="${proTip.id}"/></td>
+                            <td th:text="${proTip.proTipType}"/>
+                            <td th:text="${proTip.title}"/>
+                            <td th:text="${proTip.registerId.nickname}"/>
+                            <td th:text="${#temporals.format((proTip.updatedAt == null ? proTip.createdAt : proTip.updatedAt),'yyyy-MM-dd HH:mm')}"/>
+                            <td th:text="${proTip.useYn}"/>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="left-bottom">
+                <div class="pagination" th:if="${totalElements} != 0">
+                    <div th:if="${pageNum != 0}">
+                        <a th:href="@{/admin/pro-tips(page=${pageNum - 1})}" class="prev">&#10094; Previous</a>
+                    </div>
+                    <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
+                        <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/pro-tips(page=${currPage})}" th:text="${currPage + 1}">1</a>
+                    </div>
+                    <div th:if="${pageNum != totalPage - 1}">
+                        <a th:href="@{/admin/pro-tips(page=${pageNum + 1})}" class="next">Next &#10095;</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+</html>

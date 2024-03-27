@@ -30,7 +30,36 @@ document.addEventListener("DOMContentLoaded", function() {
 });
 
 function submitFormWithAction(action) {
-    var form = document.getElementById('actionForm');
+    let confirmed = confirm("폼을 제출하시겠습니까?");
+    if (!confirmed) {
+        return confirmed;
+    }
+    let form = document.getElementById('actionForm');
     form.action = action; // 폼의 action 속성을 동적으로 변경
     form.submit(); // 폼 제출
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('figure.media').forEach(media => {
+        const oembed = media.querySelector('oembed');
+        if (!oembed) {
+            // oembed 요소가 없으면 다음 media로 넘어갑니다.
+            return;
+        }
+        const src = oembed.getAttribute('url');
+        const iframe = document.createElement('iframe');
+
+        iframe.setAttribute('src', src);
+        iframe.setAttribute('width', '560');
+        iframe.setAttribute('height', '315');
+        iframe.setAttribute('frameborder', '0');
+        iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share');
+        iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+        iframe.setAttribute('allowfullscreen', '');
+
+        media.parentNode.replaceChild(iframe, media);
+    });
+});
+
+
+
