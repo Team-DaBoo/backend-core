@@ -1,6 +1,5 @@
 package b172.challenging.qna;
 
-import b172.challenging.announcements.AnnouncementsRequestDto;
 import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.common.domain.UseYn;
 import b172.challenging.member.domain.Member;
