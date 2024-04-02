@@ -8,4 +8,4 @@ public record GatheringStatisticsResponseDto(
     Long completedCount,
     Long ownerGatheringCount,
     Double achievementRate
-    ){ }
+){ }

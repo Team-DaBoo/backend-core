@@ -65,7 +65,6 @@ public class ProTipService {
                 .build();
     }
 
-    @Transactional
     public void postProTip(Long proTipId, Long memberId, ProTipRequestDto requestDto) {
         Member member = memberRepository.getOrThrow(memberId);
 

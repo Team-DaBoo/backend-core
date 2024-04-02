@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+        <div class="left-content">
+            <div class="activities">
+                <h1>공지사항 관리</h1>
+
+                <div>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/announcements/{id}(id=${announcements.id})} + '\''">뒤로 가기</button>
+                    </label>
+                    <form id="actionForm" method="post">
+                        <table>
+                            <caption>공지사항 관리</caption>
+                        </table>
+                        <div>
+                            <label th:for="title">제목 : &nbsp;&nbsp;</label>
+                            <input th:type="text" th:id="title" th:name="title" th:value="${announcements.title}"/>
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <div th:text="'내용'"/>
+                            <br>
+                            <textarea th:id="editor" th:class="editor" th:name="content"></textarea>
+                        </div>
+                        <br><hr><br>
+                        <div>
+                            <label>사용 여부:&nbsp;&nbsp;&nbsp;</label>
+                            <input type="radio" id="useY" name="useYn" th:value="Y" th:checked="${announcements.useYn.toString() eq 'Y'}">
+                            <label for="useY">사용</label>
+                            <input type="radio" id="useN" name="useYn" th:value="N" th:checked="${announcements.useYn.toString() eq 'N'}">
+                            <label for="useN">미사용</label>
+                        </div>
+                        <br><hr><br>
+                        <div class="pagination">
+                            <div>
+                                <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/announcements/update/{id}(id=${announcements.id})} + '\'' + ')'">수정</button>
+                            </div>
+                            <div></div>
+                            <div>
+                                <button th:type="reset">취소</button>
+                            </div>
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+</body>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
+<script th:inline="javascript">
+    let contentData = [[${announcements.content}]];
+    console.log(contentData);
+    ClassicEditor
+        .create(document.querySelector('.editor'))
+        .then(editor => {
+            window.editor = editor.setData(contentData);
+        })
+        .catch(error => {
+            console.error(error);
+        });
+</script>
+</html>
