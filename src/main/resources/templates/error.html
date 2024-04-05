@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>404 - Not Found</title>
+    <style>
+        /* 컨텐츠를 가운데 정렬하기 위한 스타일 */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 화면 전체 높이 */
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="content">
+        <h3>해당 페이지가 유효하지 않습니다. 😭</h3>
+
+        <p th:text="'ERROR CODE : '+${status} + ' ' + ${error}"></p>
+        <p th:text="'경로 :' + ${path}"></p>
+        <p>URL이 올바른지 다시 확인해주세요!</p>
+
+        <p th:text="'에러 시간 : '+${timestamp}"></p>
+    </div>
+</div>
+</body>
+</html>

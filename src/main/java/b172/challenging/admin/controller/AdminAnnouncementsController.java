@@ -1,5 +1,9 @@
-package b172.challenging.announcements;
+package b172.challenging.admin.controller;
 
+import b172.challenging.announcements.Announcements;
+import b172.challenging.announcements.AnnouncementsRequestDto;
+import b172.challenging.announcements.AnnouncementsResponseDto;
+import b172.challenging.announcements.AnnouncementsService;
 import b172.challenging.member.domain.Role;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

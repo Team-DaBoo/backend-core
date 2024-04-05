@@ -13,6 +13,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.List;
 
 @Tag(name = "배지 API", description = "배지 관련 API 입니다.")
 @RestController
@@ -29,7 +30,7 @@ public class BadgeController {
                     content = {@Content(schema = @Schema(implementation = BadgeMemberResponseDto.class))}),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다.")
     })
-    public ResponseEntity<BadgeMemberResponseDto> getMyBadgeList (Principal principal) {
+    public ResponseEntity<List<BadgeMemberResponseDto>> getMyBadgeList (Principal principal) {
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(badgeService.findMemberBadgeList(memberId));
     }

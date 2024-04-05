@@ -3,13 +3,13 @@ package b172.challenging.activitylog.controller;
 import b172.challenging.activitylog.domain.ActivityCategory;
 import b172.challenging.activitylog.dto.ActivityLogResponseDto;
 import b172.challenging.activitylog.service.ActivityService;
+import b172.challenging.common.dto.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -45,9 +45,9 @@ public class ActivityLogAdminController {
             "    \"member_id,asc\"\n" +
             "  ]\n" +
             "}")
-    public ResponseEntity<Page<ActivityLogResponseDto>> getActivity(@PathVariable(required = false) Long memberId,
-                                                                    @PathVariable(required = false) ActivityCategory category,
-                                                                    @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
+    public ResponseEntity<PageResponse<ActivityLogResponseDto>> getActivity(@PathVariable(required = false) Long memberId,
+                                                                            @PathVariable(required = false) ActivityCategory category,
+                                                                            @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(activityService.findActivityLog(memberId, category, page));
     }
 

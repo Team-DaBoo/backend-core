@@ -1,17 +1,19 @@
 package b172.challenging.badge.dto.response;
 
-import lombok.Builder;
+import b172.challenging.badge.domain.BadgeMember;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-@Builder
 public record BadgeMemberResponseDto(
 
         Long memberId,
 
 
-        List<BadgeResponseDto> badges
+        BadgeResponseDto badge
 
 ) {
+    public static BadgeMemberResponseDto from(BadgeMember badgeMember){
+        return new BadgeMemberResponseDto(
+                badgeMember.getId(),
+                BadgeResponseDto.from(badgeMember.getBadge())
+        );
+    }
 }

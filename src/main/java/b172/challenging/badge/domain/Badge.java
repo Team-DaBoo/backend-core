@@ -1,5 +1,6 @@
 package b172.challenging.badge.domain;
 
+import b172.challenging.common.domain.BaseTimeEntity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -12,7 +13,7 @@ import java.time.LocalDateTime;
 @Table(name = "badge")
 @NoArgsConstructor
 @Schema(description = "배지 정보")
-public class Badge {
+public class Badge extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

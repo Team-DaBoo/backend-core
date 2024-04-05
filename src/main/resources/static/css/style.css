@@ -52,6 +52,18 @@ main {
     z-index: 10;
 }
 
+.form-row {
+    margin-bottom: 10px; /* 각 행 사이의 간격 조절 */
+}
+.form-row label {
+    margin-right: 10px; /* 라벨과 입력 요소 사이의 간격 조절 */
+}
+.form-row input[type="date"],
+.form-row input[type="text"],
+.form-row select {
+    margin-right: 10px; /* 입력 요소들 간의 간격 조절 */
+}
+
 .main-menu {
     overflow: hidden;
     background: rgb(73, 57, 113);
@@ -267,6 +279,24 @@ main {
 }
 
 .pagination div a:hover:not(.active) {
+    background-color: #ddd;
+}
+
+.pagination button {
+    color: black;
+    float: left;
+    padding: 8px 16px;
+    text-decoration: none;
+    transition: background-color .3s;
+    border-width: 1;
+}
+
+.pagination div button.active {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.pagination div button:hover:not(.active) {
     background-color: #ddd;
 }
 

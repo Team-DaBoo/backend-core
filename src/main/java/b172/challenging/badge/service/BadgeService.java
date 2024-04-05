@@ -20,7 +20,7 @@ public class BadgeService {
 
     private final BadgeMemberRepository badgeMemberRepository;
 
-    public BadgeMemberResponseDto findMemberBadgeList(Long memberId) {
+    public List<BadgeMemberResponseDto> findMemberBadgeList(Long memberId) {
 
         List<BadgeMember> badgeMemberList = badgeMemberRepository.findByMemberId(memberId);
 
@@ -28,21 +28,10 @@ public class BadgeService {
             throw new CustomRuntimeException(Exceptions.NOT_FOUND_BADGE);
         }
 
-        List<BadgeResponseDto> badgeResponseDtos = badgeMemberList.stream()
-                .map(badgeMember -> {
-                    return BadgeResponseDto.builder()
-                            .id(badgeMember.getBadge().getId())
-                            .name(badgeMember.getBadge().getName())
-                            .description(badgeMember.getBadge().getDescription())
-                            .imageUrl(badgeMember.getBadge().getImageUrl())
-                            .createdAt(badgeMember.getCreatedAt())
-                            .build();
-                })
-                .toList();
+        return badgeMemberList.stream().map(BadgeMemberResponseDto::from).toList();
+    }
 
-        return BadgeMemberResponseDto.builder()
-                .memberId(memberId)
-                .badges(badgeResponseDtos)
-                .build();
+    public int countBadgeByMemberId(Long memberId) {
+        return badgeMemberRepository.countByMemberId(memberId);
     }
 }

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.*;
 
@@ -78,7 +79,7 @@ public class JwtService {
     }
 
 
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
+    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
         response.setHeader(accessHeader, accessToken);
         response.setStatus(HttpServletResponse.SC_OK);
         Cookie cookie = new Cookie(refreshHeader, refreshToken);
@@ -87,7 +88,7 @@ public class JwtService {
         cookie.setPath("/");
         cookie.setHttpOnly(true);
         response.addCookie(cookie);
-//        response.sendRedirect("/oauth/token/KAKAO");
+//        response.sendRedirect("");
     }
 
     public Long extractMemberId(String token) throws IllegalArgumentException {

@@ -61,5 +61,39 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
+function movePage(page) {
+    document.getElementById('page').value = page;
+    document.getElementById('actionForm').submit();
+}
 
-
+// 현재 날짜를 가져오는 함수
+// function getCurrentDate() {
+//     var today = new Date();
+//     var year = today.getFullYear();
+//     var month = (today.getMonth() + 1).toString().padStart(2, '0'); // 1월부터 9월까지 앞에 0을 붙임
+//     var day = today.getDate().toString().padStart(2, '0'); // 1일부터 9일까지 앞에 0을 붙임
+//     return year + '-' + month + '-' + day;
+// }
+//
+// // 최근 일주일 전 날짜를 계산하는 함수
+// function getOneWeekAgoDate() {
+//     var oneWeekAgo = new Date();
+//     oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+//     var year = oneWeekAgo.getFullYear();
+//     var month = (oneWeekAgo.getMonth() + 1).toString().padStart(2, '0');
+//     var day = oneWeekAgo.getDate().toString().padStart(2, '0');
+//     return year + '-' + month + '-' + day;
+// }
+//
+// // 시작일과 종료일 입력 필드에 값을 설정하는 함수
+// function setDefaultDateValues() {
+//     var startDateInput = document.getElementById('startDate');
+//     var endDateInput = document.getElementById('endDate');
+//     startDateInput.value = getOneWeekAgoDate(); // 시작일은 최근 일주일 전
+//     endDateInput.value = getCurrentDate(); // 종료일은 현재 날짜
+// }
+//
+// // 페이지 로드 시 기본 날짜 값을 설정
+// window.onload = function() {
+//     setDefaultDateValues();
+// };

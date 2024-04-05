@@ -1,6 +1,7 @@
 package b172.challenging.auth.oauth.handler;
 
 import b172.challenging.auth.oauth.CustomOauth2User;
+import b172.challenging.auth.oauth.filter.JwtAuthenticationFilter;
 import b172.challenging.auth.service.CustomOauthService;
 import b172.challenging.auth.service.JwtService;
 import b172.challenging.member.domain.Role;
@@ -22,7 +23,7 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final CustomOauthService customOauthService;
-
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     @Override
     public void onAuthenticationSuccess(
@@ -33,13 +34,10 @@ public class Oauth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String accessToken = jwtService.createAccessToken(memberId, oauth2User.getRole());
         String refreshToken = jwtService.createRefreshToken(memberId);
 
-        log.info("oauth2User.getRole() : {}", oauth2User.getRole());
-        log.info("oauth2User.getMemberId() : {}", oauth2User.getMemberId());
-        log.info(accessToken);
-        if (oauth2User.getRole() == Role.GUEST) {
-            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
-
-        } else {jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        if (oauth2User.getRole() == Role.ADMIN) {
+            jwtAuthenticationFilter.checkRefreshTokenAndReIssueTokens(response, refreshToken);
+            response.sendRedirect("/admin/member");
+//            jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         }
     }
 }

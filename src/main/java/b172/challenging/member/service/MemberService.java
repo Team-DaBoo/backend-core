@@ -3,18 +3,24 @@ package b172.challenging.member.service;
 import b172.challenging.activitylog.domain.ActivityLog;
 import b172.challenging.activitylog.domain.ActivityType;
 import b172.challenging.activitylog.event.ActivityLogEvent;
+import b172.challenging.admin.dto.MemberSearchRequestDto;
 import b172.challenging.auth.event.RegisteredEvent;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.dto.request.MemberProfileUpdateRequestDto;
 import b172.challenging.member.dto.response.MemberCheckNicknameResponseDto;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.member.dto.response.MemberProfileResponseDto;
 import b172.challenging.member.repository.MemberRepository;
 import b172.challenging.common.exception.CustomRuntimeException;
 import b172.challenging.common.exception.Exceptions;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import static org.springframework.core.annotation.MergedAnnotations.from;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +30,11 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final MemberNicknameService memberNicknameService;
     private final ApplicationEventPublisher publisher;
+
+    public PageResponse<MemberProfileResponseDto> findAllMember(MemberSearchRequestDto memberSearchRequestDto, Pageable pageable){
+//        return PageResponse.from(memberRepository.findAll(pageable).map(MemberProfileResponseDto::from));
+        return PageResponse.from(memberRepository.searchByCriteria(memberSearchRequestDto, pageable).map(MemberProfileResponseDto::from));
+    }
 
     public Member updateMemberProfile(Long memberId, MemberProfileUpdateRequestDto memberProfileUpdateRequestDto) {
         Member member = memberRepository.findById(memberId)
@@ -57,5 +68,9 @@ public class MemberService {
         return MemberCheckNicknameResponseDto.builder()
                 .duplicate(duplicate)
                 .build();
+    }
+
+    public Member findMemberById(Long memberId) {
+        return memberRepository.getOrThrow(memberId);
     }
 }

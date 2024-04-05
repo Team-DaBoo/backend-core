@@ -1,12 +1,25 @@
 package b172.challenging.member.repository;
 
+import b172.challenging.admin.dto.MemberSearchRequestDto;
+import b172.challenging.member.domain.Member;
+import b172.challenging.member.domain.OauthProvider;
+import b172.challenging.member.domain.Sex;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
+import static b172.challenging.common.util.ChallengingUtils.parseEndStringToLocalDateTime;
+import static b172.challenging.common.util.ChallengingUtils.parseStartStringToLocalDateTime;
 import static b172.challenging.member.domain.QMember.member;
+import static org.springframework.util.StringUtils.hasText;
 
 @Repository
 public class MemberCustomRepositoryImpl implements MemberCustomRepository {
@@ -36,5 +49,64 @@ public class MemberCustomRepositoryImpl implements MemberCustomRepository {
                 .set(member.jwtCode, jwtCode)
                 .where(member.id.eq(memberId))
                 .execute();
+    }
+
+    @Override
+    public Page<Member> searchByCriteria(MemberSearchRequestDto searchDto, Pageable pageable) {
+        List<Member> memberList = jpaQueryFactory
+                .selectFrom(member)
+                .where(
+                        startDateAfter(searchDto.startDate()),
+                        endDateBefore(searchDto.endDate()),
+                        sexEq(searchDto.sex()),
+                        isLeavedEq(searchDto.isLeaved()),
+                        oauthProviderEq(searchDto.oauthProvider()),
+                        searchCriteriaEq(searchDto.searchCriteria(), searchDto.searchQuery())
+                )
+                .offset(pageable.getOffset()) // 페이지 시작 위치
+                .limit(pageable.getPageSize()) // 페이지 크기
+                .orderBy(member.id.desc())
+                .fetch();
+
+        long total = jpaQueryFactory
+                .selectFrom(member)
+                .where(
+                        startDateAfter(searchDto.startDate()),
+                        endDateBefore(searchDto.endDate()),
+                        sexEq(searchDto.sex()),
+                        isLeavedEq(searchDto.isLeaved()),
+                        oauthProviderEq(searchDto.oauthProvider()),
+                        searchCriteriaEq(searchDto.searchCriteria(), searchDto.searchQuery())
+                )
+                .fetchCount();
+        return new PageImpl<>(memberList, pageable, total);
+    }
+
+    private BooleanExpression startDateAfter(String startDate) {
+        return hasText(startDate) ? member.createdAt.after(parseStartStringToLocalDateTime(startDate)) : null;
+    }
+
+    private BooleanExpression endDateBefore(String endDate) {
+        return hasText(endDate) ? member.createdAt.before(parseEndStringToLocalDateTime(endDate)) : null;
+    }
+
+    private BooleanExpression sexEq(Sex sex) {
+        return sex == null ? null : member.sex.eq(sex);
+    }
+
+    private BooleanExpression isLeavedEq(Boolean isLeaved) {
+        return isLeaved == null ? null : member.isLeaved.eq(isLeaved);
+    }
+
+    private BooleanExpression oauthProviderEq(OauthProvider oauthProvider) {
+        return oauthProvider == null ? null : member.oauthProvider.eq(oauthProvider);
+    }
+
+    private BooleanExpression searchCriteriaEq(String searchCriteria, String searchQuery) {
+        if ("nickname".equals(searchCriteria) && hasText(searchQuery)) {
+            return member.nickname.contains(searchQuery);
+        }
+        // 기타 searchCriteria 조건 추가
+        return null;
     }
 }

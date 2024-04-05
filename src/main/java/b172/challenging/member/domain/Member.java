@@ -52,6 +52,7 @@ public class Member extends BaseTimeEntity {
         this.nickname = nickname;
         this.role = Role.GUEST;
         this.isLeaved = false;
+        this.sex = Sex.NONE;
     }
 
     public Member(Long memberId){

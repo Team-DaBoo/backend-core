@@ -1,6 +1,10 @@
-package b172.challenging.qna;
+package b172.challenging.admin.controller;
 
 import b172.challenging.member.domain.Role;
+import b172.challenging.qna.QnA;
+import b172.challenging.qna.QnARequestDto;
+import b172.challenging.qna.QnAResponseDto;
+import b172.challenging.qna.QnAService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;

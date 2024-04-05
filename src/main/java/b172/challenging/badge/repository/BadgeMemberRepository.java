@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface BadgeMemberRepository extends JpaRepository<BadgeMember, Long> {
     List<BadgeMember> findByMemberId(Long memberId);
+
+    int countByMemberId(Long memberId);
 }

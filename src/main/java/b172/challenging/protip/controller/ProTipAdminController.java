@@ -43,16 +43,4 @@ public class ProTipAdminController {
                 ? ResponseEntity.ok(proTipservice.findAllProTip(role, page))
                 : ResponseEntity.ok(proTipservice.findProTipByType(role, proTipType, page)) ;
     }
-
-//    @PutMapping(value = {""})
-//    @Operation(summary = "꿀팁 정보 저장", description = "꿀팁 내용 저장하기")
-//    @ApiResponses(value = {
-//            @ApiResponse(responseCode = "201", description = "성공"),
-//            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-//    })
-//    @Parameter(name = "type", description = "type : [YOUTUBE , BLOG, APP]")
-//    public ResponseEntity<ProTipMakeResponseDto> putProTip(@RequestBody ProTipRequestDto reqeustDto) {
-//
-//        return ResponseEntity.ok(proTipservice.putProTip(reqeustDto));
-//    }
 }
