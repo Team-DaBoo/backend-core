@@ -72,16 +72,16 @@
                 </div>
             </div>
             <div class="left-bottom">
-                <div class="pagination" th:if="${announcements.totalPages > 1}">
-                    <div th:if="${announcements.hasPrevious()}">
-                        <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number - 1} + '\'' + ')'" class="prev">&#10094; Previous</button>
-                    </div>
-                    <div th:each="currPage : ${#numbers.sequence((announcements.totalPages < 5 ? 0 : announcements.totalPages - 5), announcements.totalPages - 1)}">
-                        <button th:type="button" th:onclick="'movePage(\''+ ${currPage} +'\'' + ')'" th:class="${announcements.number == currPage ? 'active' : ''}" th:text="${currPage + 1}"/>
-                    </div>
-                    <div th:if="${announcements.hasNext()}">
-                        <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number + 1} +'\'' + ')'" class="next">Next &#10095;</button>
-                    </div>
+                <div th:if="${announcements.hasPrevious()}">
+                    <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number - 1} + '\'' + ')'" class="prev">&#10094; Previous</button>
+                </div>
+                <span th:if="${announcements.number > 2 && announcements.totalPages > 5}">...</span>
+                <div th:each="currPage : ${#numbers.sequence(announcements.number > 2 ? (announcements.totalPages - announcements.number > 2 ? announcements.number - 2 : (announcements.totalPages > 5 ? announcements.totalPages - 5 : 0)) : 0, announcements.number > 2 ? (announcements.totalPages - announcements.number > 2 ? announcements.number + 2 : announcements.totalPages - 1) : (announcements.totalPages > 5 ? 4 : announcements.totalPages - 1))}">
+                    <button th:type="button" th:onclick="'movePage(\''+ ${currPage} +'\'' + ')'" th:class="${announcements.number == currPage ? 'active' : ''}" th:text="${currPage + 1}"/>
+                </div>
+                <span th:if="${announcements.number < announcements.totalPages - 3 && announcements.totalPages > 5}">...</span>
+                <div th:if="${announcements.hasNext()}">
+                    <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number + 1} +'\'' + ')'" class="next">Next &#10095;</button>
                 </div>
             </div>
         </div>

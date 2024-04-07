@@ -94,9 +94,11 @@
                     <div th:if="${members.hasPrevious()}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${members.number - 1} + '\'' + ')'" class="prev">&#10094; Previous</button>
                     </div>
-                    <div th:each="currPage : ${#numbers.sequence((members.totalPages < 5 ? 0 : members.totalPages - 5), members.totalPages - 1)}">
+                    <span th:if="${members.number > 2 && members.totalPages > 5}">...</span>
+                    <div th:each="currPage : ${#numbers.sequence(members.number > 2 ? (members.totalPages - members.number > 2 ? members.number - 2 : (members.totalPages > 5 ? members.totalPages - 5 : 0)) : 0, members.number > 2 ? (members.totalPages - members.number > 2 ? members.number + 2 : members.totalPages - 1) : (members.totalPages > 5 ? 4 : members.totalPages - 1))}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${currPage} +'\'' + ')'" th:class="${members.number == currPage ? 'active' : ''}" th:text="${currPage + 1}"/>
                     </div>
+                    <span th:if="${members.number < members.totalPages - 3 && members.totalPages > 5}">...</span>
                     <div th:if="${members.hasNext()}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${members.number + 1} +'\'' + ')'" class="next">Next &#10095;</button>
                     </div>

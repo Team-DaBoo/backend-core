@@ -98,9 +98,11 @@
                     <div th:if="${gatherings.hasPrevious()}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${gatherings.number - 1} + '\'' + ')'" class="prev">&#10094; Previous</button>
                     </div>
-                    <div th:each="currPage : ${#numbers.sequence((gatherings.totalPages < 5 ? 0 : gatherings.totalPages - 5), gatherings.totalPages - 1)}">
+                    <span th:if="${gatherings.number > 2 && gatherings.totalPages > 5}">...</span>
+                    <div th:each="currPage : ${#numbers.sequence(gatherings.number > 2 ? (gatherings.totalPages - gatherings.number > 2 ? gatherings.number - 2 : (gatherings.totalPages > 5 ? gatherings.totalPages - 5 : 0)) : 0, gatherings.number > 2 ? (gatherings.totalPages - gatherings.number > 2 ? gatherings.number + 2 : gatherings.totalPages - 1) : (gatherings.totalPages > 5 ? 4 : gatherings.totalPages - 1))}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${currPage} +'\'' + ')'" th:class="${gatherings.number == currPage ? 'active' : ''}" th:text="${currPage + 1}"/>
                     </div>
+                    <span th:if="${gatherings.number < gatherings.totalPages - 3 && gatherings.totalPages > 5}">...</span>
                     <div th:if="${gatherings.hasNext()}">
                         <button th:type="button" th:onclick="'movePage(\''+ ${gatherings.number + 1} +'\'' + ')'" class="next">Next &#10095;</button>
                     </div>
