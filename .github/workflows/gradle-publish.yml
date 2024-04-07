@@ -35,7 +35,7 @@ jobs:
     # Github secrets로부터 데이터를 받아서, 워크 플로우에 파일을 생성
     - name: Make application.yml
       run: |
-          cd ./src/main/resources
+          cd ./src/main/resources/config
           # touch ./application.yml
           echo "${{ secrets.SECURITY_YML }}" > ./application-security.yml
           echo "${{ secrets.PROD_YML }}" > ./application-prod.yml
