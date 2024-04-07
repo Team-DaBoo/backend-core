@@ -1,18 +1,29 @@
 package b172.challenging.qna;
 
-import b172.challenging.member.domain.Role;
-import lombok.Builder;
+import b172.challenging.common.domain.UseYn;
+import b172.challenging.member.dto.MemberResponseDto;
 
-import java.util.List;
+import java.time.LocalDateTime;
 
-@Builder
 public record QnAResponseDto(
-        List<QnA> qnAList,
-        int pageNo,
-        int pageSize,
-        long totalElements,
-        int totalPages,
-        boolean last,
-        Role role
+        Long id,
+        String title,
+        String content,
+        MemberResponseDto registerId,
+        UseYn useYn,
+        LocalDateTime createdAt,
+        LocalDateTime updatedAt
+
 ) {
+    public static QnAResponseDto from(QnA qnA){
+        return new QnAResponseDto(
+                qnA.getId(),
+                qnA.getTitle(),
+                qnA.getContent(),
+                MemberResponseDto.from(qnA.getRegisterId()),
+                qnA.getUseYn(),
+                qnA.getCreatedAt(),
+                qnA.getUpdatedAt()
+        );
+    }
 }

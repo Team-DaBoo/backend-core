@@ -9,9 +9,45 @@
             <div class="activities">
                 <h1>공지사항 관리</h1>
                 <div>
-                    <label>
+                    <form id="actionForm" th:action="@{/admin/announcements}" th:object="${condition}" method="get">
+                        <!-- 두 번째 라인: 검색조건(셀렉트박스), 검색 내용(쿼리) -->
+                        <div class="form-row">
+                            <label for="searchCriteria">검색조건:</label>
+                            <select id="searchCriteria" name="searchCriteria">
+                                <option value="">전체</option>
+                                <option th:value="nickname"
+                                        th:text="닉네임"
+                                        th:selected="${condition.searchCriteria() eq 'nickname'}" />
+                                <option th:value="title"
+                                        th:text="제목"
+                                        th:selected="${condition.searchCriteria() eq 'title'}" />
+                            </select>
+
+                            <label for="searchQuery">검색 내용:</label>
+                            <input type="text" id="searchQuery" name="searchQuery" th:value="*{searchQuery}" placeholder="Search Query" />
+
+                            <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/announcements} + '\'' + ')'">검색</button>
+
+                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <input type="hidden" name="page" id="page" value="0" />
+                            <input type="hidden" name="size" id="size" value="5" />
+                        </div>
+
+                        <div class="form-row">
+                            <label for="useYn">사용여부:</label>
+                            <select id="useYn" name="useYn">
+                                <option value="">전체</option>
+                                <option th:each="useYn : ${T(b172.challenging.common.domain.UseYn).values()}"
+                                        th:value="${useYn}" th:text="${useYn}"
+                                        th:selected="${condition.useYn() eq useYn}"/>
+                            </select>
+                        </div>
+                    </form>
+                    <br>
+                    <label th:text="'총 ' + ${announcements.totalElements()} + ' 건'"/>
+                    <div class="right-align">
                         <button th:onclick="'window.location.href=\'' + @{/admin/announcements/create} + '\''">공지사항 생성</button>
-                    </label>
+                    </div>
                     <table>
                         <caption>공지사항 관리</caption>
                         <thead>
@@ -19,32 +55,32 @@
                             <th>번호</th>
                             <th>제목</th>
                             <th>등록자</th>
-                            <th>등록일 (최종 수정일)</th>
+                            <th>등록일</th>
                             <th>사용여부</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:if="${!announcementsList.isEmpty()}" th:each="announcements : ${announcementsList}">
-                            <td><a th:href="@{/admin/announcements/{id}(id=${announcements.id})}" th:text="${announcements.id}"/></td>
-                            <td th:text="${announcements.title}"/>
-                            <td th:text="${announcements.registerId.nickname}"/>
-                            <td th:text="${#temporals.format((announcements.updatedAt == null ? announcements.createdAt : announcements.updatedAt),'yyyy-MM-dd HH:mm')}"/>
-                            <td th:text="${announcements.useYn}"/>
+                        <tr th:if="${!announcements.list().isEmpty()}" th:each="announcement : ${announcements.list()}">
+                            <td><a th:href="@{/admin/announcements/{id}(id=${announcement.id})}" th:text="${announcement.id}"/></td>
+                            <td th:text="${announcement.title}"/>
+                            <td th:text="${announcement.registerId.nickname}"/>
+                            <td th:text="${#temporals.format((announcement.updatedAt == null ? announcement.createdAt : announcement.updatedAt),'yyyy-MM-dd HH:mm')}"/>
+                            <td th:text="${announcement.useYn}"/>
                         </tr>
                         </tbody>
                     </table>
                 </div>
             </div>
             <div class="left-bottom">
-                <div class="pagination" th:if="${totalElements} != 0">
-                    <div th:if="${pageNum != 0}">
-                        <a th:href="@{/admin/announcements(page=${pageNum - 1})}" class="prev">&#10094; Previous</a>
+                <div class="pagination" th:if="${announcements.totalPages > 1}">
+                    <div th:if="${announcements.hasPrevious()}">
+                        <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number - 1} + '\'' + ')'" class="prev">&#10094; Previous</button>
                     </div>
-                    <div th:each="currPage : ${#numbers.sequence(0, totalPage - 1)}">
-                        <a th:class="${pageNum == currPage ? 'active' : ''}" th:href="@{/admin/announcements(page=${currPage})}" th:text="${currPage + 1}">1</a>
+                    <div th:each="currPage : ${#numbers.sequence((announcements.totalPages < 5 ? 0 : announcements.totalPages - 5), announcements.totalPages - 1)}">
+                        <button th:type="button" th:onclick="'movePage(\''+ ${currPage} +'\'' + ')'" th:class="${announcements.number == currPage ? 'active' : ''}" th:text="${currPage + 1}"/>
                     </div>
-                    <div th:if="${pageNum != totalPage - 1}">
-                        <a th:href="@{/admin/announcements(page=${pageNum + 1})}" class="next">Next &#10095;</a>
+                    <div th:if="${announcements.hasNext()}">
+                        <button th:type="button" th:onclick="'movePage(\''+ ${announcements.number + 1} +'\'' + ')'" class="next">Next &#10095;</button>
                     </div>
                 </div>
             </div>

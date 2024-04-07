@@ -10,7 +10,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import org.springframework.data.domain.Pageable;
 
-public interface GatheringRepository extends JpaRepository<Gathering,Long> {
+public interface GatheringRepository extends JpaRepository<Gathering,Long>,GatheringCustomRepository {
     Page<Gathering> findByGatheringMembersMember_IdAndGatheringMembersStatus(Long memberId, GatheringMemberStatus gatheringStatus, Pageable page);
     Page<Gathering> findByGatheringMembersMember_IdAndGatheringMembersStatusNot(Long memberId,GatheringMemberStatus gatheringStatus, Pageable page);
     Page<Gathering> findByOwnerMember_IdAndGatheringMembersStatus(Long memberId,GatheringMemberStatus gatheringMemberStatus, Pageable page);

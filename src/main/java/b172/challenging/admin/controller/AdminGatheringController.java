@@ -1,11 +1,14 @@
 package b172.challenging.admin.controller;
 
+import b172.challenging.admin.dto.GatheringSearchRequestDto;
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.gathering.domain.AppTechPlatform;
 import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
 import b172.challenging.gathering.dto.request.GatheringSavingLogRequestDto;
 import b172.challenging.gathering.dto.response.GatheringMemberResponseDto;
 import b172.challenging.gathering.dto.response.GatheringPageResponseDto;
+import b172.challenging.gathering.dto.response.GatheringResponseDto;
 import b172.challenging.gathering.service.GatheringMemberService;
 import b172.challenging.gathering.service.GatheringSavingLogService;
 import b172.challenging.gathering.service.GatheringService;
@@ -29,16 +32,13 @@ public class AdminGatheringController {
     private final GatheringSavingLogService gatheringSavingLogService;
     @GetMapping
     public String adminGatheringPage(Model model,
-                                     @RequestParam(required = false) GatheringStatus gatheringStatus,
-                                     @RequestParam(required = false) AppTechPlatform appTechPlatform,
-                                     @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable) {
+                                     @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+                                     GatheringSearchRequestDto gatheringSearchRequestDto) {
 
-        GatheringPageResponseDto gatheringPageResponseDto = gatheringService.findGathering(gatheringStatus,appTechPlatform,pageable);
+        PageResponse<GatheringResponseDto> gatherings = gatheringService.findAllGathering(gatheringSearchRequestDto, pageable);
 
-        model.addAttribute("gatheringList",gatheringPageResponseDto.gatheringList());
-        model.addAttribute("pageNum",pageable.getPageNumber());
-        model.addAttribute("totalPage",gatheringPageResponseDto.totalPages());
-        model.addAttribute("totalElements",gatheringPageResponseDto.totalElements());
+        model.addAttribute("gatherings",gatherings);
+        model.addAttribute("condition",gatheringSearchRequestDto);
 
         return "gatherings/gathering-page";
     }

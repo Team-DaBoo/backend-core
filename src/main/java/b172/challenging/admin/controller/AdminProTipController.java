@@ -1,5 +1,7 @@
 package b172.challenging.admin.controller;
 
+import b172.challenging.admin.dto.ProTipSearchRequestDto;
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.member.domain.Role;
 import b172.challenging.protip.domain.ProTip;
 import b172.challenging.protip.domain.ProTipType;
@@ -28,18 +30,17 @@ public class AdminProTipController {
 
     @GetMapping
     public String adminProTipPage(Model model,
-                                  @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable){
+                                  @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+                                  ProTipSearchRequestDto proTipSearchRequestDto){
 
         pageable = pageable == null
                 ? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
                 : pageable;
 
-        ProTipResponseDto proTipResponseDto = proTipService.findAllProTip(Role.ADMIN, pageable);
+        PageResponse<ProTipResponseDto> proTips =  proTipService.findAllProTip(Role.ADMIN,proTipSearchRequestDto,pageable);
 
-        model.addAttribute("proTipList" , proTipResponseDto.proTips());
-        model.addAttribute("pageNum",pageable.getPageNumber());
-        model.addAttribute("totalPage",proTipResponseDto.totalPages());
-        model.addAttribute("totalElements",proTipResponseDto.totalElements());
+        model.addAttribute("proTips" , proTips);
+        model.addAttribute("condition",proTipSearchRequestDto);
 
         return "pro-tips/pro-tip-page";
     }

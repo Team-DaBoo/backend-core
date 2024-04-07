@@ -1,6 +1,8 @@
 package b172.challenging.qna;
 
 import b172.challenging.common.domain.UseYn;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.common.dto.SearchRequestDto;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.repository.MemberRepository;
@@ -10,30 +12,19 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class QnAService {
 
     private final QnARepository qnARepository;
     private final MemberRepository memberRepository;
-    public QnAResponseDto findAllQnA(Role role, Pageable pageable) {
+    public PageResponse<QnAResponseDto> findAllQnA(Role role, SearchRequestDto searchRequestDto, Pageable pageable) {
         Page<QnA> qnAPage =
                 role == Role.ADMIN
-                        ? qnARepository.findAll(pageable)
+                        ? qnARepository.searchByCriteria(searchRequestDto, pageable)
                         : qnARepository.findByUseYnIs(UseYn.Y, pageable);
-        List<QnA> qnAList = qnAPage.getContent();
 
-        return QnAResponseDto.builder()
-                .qnAList(qnAList)
-                .pageNo(pageable.getPageNumber())
-                .pageSize(pageable.getPageSize())
-                .totalElements(qnAPage.getTotalElements())
-                .totalPages(qnAPage.getTotalPages())
-                .last(qnAPage.isLast())
-                .role(role)
-                .build();
+        return PageResponse.from(qnAPage.map(QnAResponseDto::from));
     }
 
     public QnA findQnAById(Long id) {

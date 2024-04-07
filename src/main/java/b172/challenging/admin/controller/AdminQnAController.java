@@ -1,5 +1,7 @@
 package b172.challenging.admin.controller;
 
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.common.dto.SearchRequestDto;
 import b172.challenging.member.domain.Role;
 import b172.challenging.qna.QnA;
 import b172.challenging.qna.QnARequestDto;
@@ -29,17 +31,16 @@ public class AdminQnAController {
 
     @GetMapping
     public String adminQnAPage(Model model,
-                               @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable) {
+                               @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+                               SearchRequestDto searchRequestDto) {
         pageable = pageable == null
                 ? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
                 : pageable;
 
-        QnAResponseDto qnAResponseDto = qnAService.findAllQnA(Role.ADMIN, pageable);
+        PageResponse<QnAResponseDto> qnAs = qnAService.findAllQnA(Role.ADMIN, searchRequestDto, pageable);
 
-        model.addAttribute("qnaList" , qnAResponseDto.qnAList());
-        model.addAttribute("pageNum",pageable.getPageNumber());
-        model.addAttribute("totalPage",qnAResponseDto.totalPages());
-        model.addAttribute("totalElements",qnAResponseDto.totalElements());
+        model.addAttribute("qnAs" , qnAs);
+        model.addAttribute("condition",searchRequestDto);
 
         return "qna/qna-page";
     }

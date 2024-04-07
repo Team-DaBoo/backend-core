@@ -1,5 +1,7 @@
 package b172.challenging.protip.service;
 
+import b172.challenging.admin.dto.ProTipSearchRequestDto;
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.common.domain.UseYn;
@@ -17,9 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class ProTipService {
@@ -27,42 +26,22 @@ public class ProTipService {
     private final ProTipRepository proTipRepository;
     private final MemberRepository memberRepository;
 
-    public ProTipResponseDto findAllProTip(Role role, Pageable page) {
+    public PageResponse<ProTipResponseDto> findAllProTip(Role role, ProTipSearchRequestDto proTipSearchRequestDto, Pageable page) {
         Page<ProTip> proTipPage =
                 role == Role.ADMIN
-                        ? proTipRepository.findAll(page)
+                        ? proTipRepository.searchByCriteria(proTipSearchRequestDto, page)
                         : proTipRepository.findByUseYnIs(UseYn.Y, page);
 
-        List<ProTip> proTipList = new ArrayList<>(proTipPage.getContent());
-
-        return ProTipResponseDto.builder()
-                .proTips(proTipList)
-                .pageNo(page.getPageNumber())
-                .pageSize(page.getPageSize())
-                .totalElements(proTipPage.getTotalElements())
-                .totalPages(proTipPage.getTotalPages())
-                .last(proTipPage.isLast())
-                .role(role)
-                .build();
+        return PageResponse.from(proTipPage.map(ProTipResponseDto::from));
     }
 
-    public ProTipResponseDto findProTipByType(Role role, ProTipType proTipType, Pageable page) {
+    public PageResponse<ProTipResponseDto> findProTipByType(Role role, ProTipType proTipType, Pageable page) {
         Page<ProTip> proTipPage =
                 role.equals(Role.ADMIN)
                     ? proTipRepository.findByProTipType(proTipType, page)
                     : proTipRepository.findByProTipTypeAndUseYnIs(proTipType, UseYn.Y, page);
 
-        List<ProTip> proTipList = new ArrayList<>(proTipPage.getContent());
-
-        return ProTipResponseDto.builder()
-                .proTips(proTipList)
-                .pageNo(page.getPageNumber())
-                .pageSize(page.getPageSize())
-                .totalElements(proTipPage.getTotalElements())
-                .totalPages(proTipPage.getTotalPages())
-                .last(proTipPage.isLast())
-                .role(role)
-                .build();
+        return PageResponse.from(proTipPage.map(ProTipResponseDto::from));
     }
 
     public void postProTip(Long proTipId, Long memberId, ProTipRequestDto requestDto) {

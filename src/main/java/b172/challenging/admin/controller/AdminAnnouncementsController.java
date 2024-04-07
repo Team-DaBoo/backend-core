@@ -4,6 +4,8 @@ import b172.challenging.announcements.Announcements;
 import b172.challenging.announcements.AnnouncementsRequestDto;
 import b172.challenging.announcements.AnnouncementsResponseDto;
 import b172.challenging.announcements.AnnouncementsService;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.common.dto.SearchRequestDto;
 import b172.challenging.member.domain.Role;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -29,17 +31,16 @@ public class AdminAnnouncementsController {
     private final AnnouncementsService announcementsService;
     @GetMapping
     public String adminAnnouncementsPage(Model model,
-                                         @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable) {
+                                         @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
+                                         SearchRequestDto searchRequestDto) {
         pageable = pageable == null
                 ? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
                 : pageable;
 
-        AnnouncementsResponseDto announcementsResponseDto = announcementsService.findAllAnnouncements(Role.ADMIN, pageable);
+        PageResponse<AnnouncementsResponseDto> announcements = announcementsService.findAllAnnouncements(Role.ADMIN,searchRequestDto, pageable);
 
-        model.addAttribute("announcementsList" , announcementsResponseDto.announcementsList());
-        model.addAttribute("pageNum",pageable.getPageNumber());
-        model.addAttribute("totalPage",announcementsResponseDto.totalPages());
-        model.addAttribute("totalElements",announcementsResponseDto.totalElements());
+        model.addAttribute("announcements" , announcements);
+        model.addAttribute("condition",searchRequestDto);
 
         return "announcements/announcements-page";
     }

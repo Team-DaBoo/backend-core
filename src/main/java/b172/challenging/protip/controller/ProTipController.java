@@ -1,5 +1,6 @@
 package b172.challenging.protip.controller;
 
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.member.domain.Role;
 import b172.challenging.auth.oauth.CustomOauth2User;
 import b172.challenging.protip.domain.ProTipType;
@@ -37,14 +38,14 @@ public class ProTipController {
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
     @Parameter(name = "type", description = "type : [YOUTUBE , BLOG, APP]")
-    public ResponseEntity<ProTipResponseDto> getProTip(@PathVariable(required = false) ProTipType type,
-                                                       @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page,
-                                                       @AuthenticationPrincipal DefaultOAuth2User oauth2User) {
+    public ResponseEntity<PageResponse<ProTipResponseDto>> getProTip(@PathVariable(required = false) ProTipType type,
+                                                                    @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page,
+                                                                    @AuthenticationPrincipal DefaultOAuth2User oauth2User) {
         CustomOauth2User customOauth2User = (CustomOauth2User) oauth2User;
         Role role = customOauth2User.getRole();
 
         return type == null
-                ? ResponseEntity.ok(proTipservice.findAllProTip(role, page))
+                ? ResponseEntity.ok(proTipservice.findAllProTip(role, null, page))
                 : ResponseEntity.ok(proTipservice.findProTipByType(role, type, page)) ;
     }
 }

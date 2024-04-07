@@ -285,10 +285,11 @@ main {
 .pagination button {
     color: black;
     float: left;
-    padding: 8px 16px;
+    padding: 10px 16px;
     text-decoration: none;
     transition: background-color .3s;
-    border-width: 1;
+    cursor: pointer;
+    border: none; /* 테두리 제거 */
 }
 
 .pagination div button.active {
@@ -305,82 +306,9 @@ main {
     cursor: pointer;
 }
 
-.day-and-activity {
-    display: grid;
-    grid-template-columns: 15% 60% 25%;
-    align-items: center;
-    border-radius: 14px;
-    margin-bottom: 5px;
-    color: #484d53;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 3px;
-}
-
-.activity-one {
-    background-color: rgb(124, 136, 224, 0.5);
-    background-image: linear-gradient(
-            240deg,
-            rgb(124, 136, 224) 0%,
-            #c3f4fc 100%
-    );
-}
-
-.activity-two {
-    background-color: #aee2a4a1;
-    background-image: linear-gradient(240deg, #e5a243ab 0%, #f7f7aa 90%);
-}
-
-.activity-three {
-    background-color: #ecfcc376;
-    background-image: linear-gradient(240deg, #97e7d1 0%, #ecfcc3 100%);
-}
-
-.activity-four {
-    background-color: #e6a7c3b5;
-    background-image: linear-gradient(240deg, #fc8ebe 0%, #fce5c3 100%);
-}
-
-.day {
+.right-align {
     display: flex;
-    flex-direction: column;
-    align-items: center;
-    transform: translateY(-10px);
-}
-
-.day h1 {
-    font-size: 1.6rem;
-    font-weight: 600;
-}
-
-.day p {
-    text-transform: uppercase;
-    font-size: 0.9rem;
-    font-weight: 600;
-    transform: translateY(-3px);
-}
-
-.activity {
-    border-left: 3px solid #484d53;
-}
-
-.participants {
-    display: flex;
-    margin-left: 20px;
-}
-
-.participants img {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
-    z-index: calc(2 * var(--i));
-    margin-left: -10px;
-    box-shadow: rgba(0, 0, 0, 0.16) 0px 1px 3px;
-}
-
-.activity h2 {
-    margin-left: 10px;
-    font-size: 1.25rem;
-    font-weight: 600;
-    border-radius: 12px;
+    justify-content: right;
 }
 
 .btn {

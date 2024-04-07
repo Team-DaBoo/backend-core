@@ -1,6 +1,8 @@
 package b172.challenging.announcements;
 
 import b172.challenging.common.domain.UseYn;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.common.dto.SearchRequestDto;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.domain.Role;
 import b172.challenging.member.repository.MemberRepository;
@@ -19,22 +21,13 @@ public class AnnouncementsService {
     private final AnnouncementsRepository announcementsRepository;
     private final MemberRepository memberRepository;
 
-    public AnnouncementsResponseDto findAllAnnouncements(Role role, Pageable pageable) {
+    public PageResponse<AnnouncementsResponseDto> findAllAnnouncements(Role role, SearchRequestDto searchRequestDto, Pageable pageable) {
         Page<Announcements> announcementsPage =
                 role == Role.ADMIN
-                        ? announcementsRepository.findAll(pageable)
+                        ? announcementsRepository.searchByCriteria(searchRequestDto, pageable)
                         : announcementsRepository.findByUseYnIs(UseYn.Y, pageable);
-        List<Announcements> announcementsList = announcementsPage.getContent();
 
-        return AnnouncementsResponseDto.builder()
-                .announcementsList(announcementsList)
-                .pageNo(pageable.getPageNumber())
-                .pageSize(pageable.getPageSize())
-                .totalElements(announcementsPage.getTotalElements())
-                .totalPages(announcementsPage.getTotalPages())
-                .last(announcementsPage.isLast())
-                .role(role)
-                .build();
+        return PageResponse.from(announcementsPage.map(AnnouncementsResponseDto::from));
     }
 
     public Announcements findAnnouncementsById(Long id) {

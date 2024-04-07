@@ -5,7 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface QnARepository extends JpaRepository<QnA, Long> {
+public interface QnARepository extends JpaRepository<QnA, Long>,QnACustomRepository {
 
     Page<QnA> findByUseYnIs(UseYn useYn, Pageable pageable);
 }

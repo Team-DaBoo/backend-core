@@ -1,5 +1,7 @@
 package b172.challenging.gathering.service;
 
+import b172.challenging.admin.dto.GatheringSearchRequestDto;
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.gathering.dto.response.GatheringResponseDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
 import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
@@ -29,6 +31,10 @@ public class GatheringService {
     private final GatheringMemberRepository gatheringMemberRepository;
     private final GatheringMemberCustomRepository gatheringMemberCustomRepository;
     private final MemberRepository memberRepository;
+
+    public PageResponse<GatheringResponseDto> findAllGathering(GatheringSearchRequestDto gatheringSearchRequestDto, Pageable pageable) {
+        return PageResponse.from(gatheringRepository.searchByCriteria(gatheringSearchRequestDto,pageable).map(GatheringResponseDto::from));
+    }
 
     public GatheringPageResponseDto findGathering(GatheringStatus gatheringStatus, AppTechPlatform platform, Pageable page) {
         Page<Gathering> gatheringPage;
