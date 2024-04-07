@@ -50,8 +50,8 @@ public class SecurityConfig {
     @Value("${app.cors.allowedOrigins.prod}")
     private String corsProd;
 
+    @Profile(value = {"local"})
     @Bean
-    @Profile(value = {"local","dev"})
     public WebSecurityCustomizer configureH2ConsoleEnable() {
         return (web) -> web.ignoring()
                 .requestMatchers(PathRequest.toH2Console());
