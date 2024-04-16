@@ -12,7 +12,9 @@
                 <button th:onclick="'window.location.href=\'' + @{/admin/member} + '\''">뒤로가기</button>
             </label>
             <table>
-                <caption th:text="${title_member}">기본 정보</caption>
+                <caption>기본 정보
+                    <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}/profile(id=${member.id})} + '\''">수정</button>
+                </caption>
                 <thead>
                 <tr>
                     <th>회원번호</th>
@@ -37,7 +39,7 @@
                 </tbody>
             </table>
             <table>
-                <caption th:text="${title_gathering}">모임 현황</caption>
+                <caption>모임 현황</caption>
                 <thead>
                 <tr>
                     <th>참여중</th>
@@ -46,17 +48,18 @@
                     <th>달성률</th>
                 </tr>
                 </thead>
-                <tbody th:if="${statics != null}">
-                <tr th:each="statics : ${statics}">
-                    <td th:text="${statics.onGoingCount()}">1</td>
-                    <td th:text="${statics.completedCount()}">구글</td>
-                    <td th:text="${statics.ownerGatheringCount()}">행복한 토끼</td>
-                    <td th:text="${statics.achievementRate()}">1999</td>
+                <tbody th:if="${statistics != null}">
+                <tr th:object="${statistics}">
+                    <td th:text="*{onGoingCount}"/>
+                    <td><a th:href="@{/admin/gathering(searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{onGoingCount}"/></td>
+                    <td th:text="*{completedCount}"/>
+                    <td th:text="*{ownerGatheringCount}"/>
+                    <td th:text="*{achievementRate}"/>
                 </tr>
                 </tbody>
             </table>
             <table>
-                <caption th:text="${title_etc}">기타</caption>
+                <caption>기타</caption>
                 <thead>
                 <tr>
                     <th>나의집</th>
@@ -65,13 +68,13 @@
                 </thead>
                 <tbody th:if="${myHome != null}">
                 <tr>
-                    <td th:text="${myHome}">초가집</td>
-                    <td th:text="${badgeCount}">2</td>
+                    <td th:text="${myHome}"/>
+                    <td th:text="${badgeCount}"/>
                 </tr>
                 </tbody>
             </table>
             <table>
-                <caption th:text="${title_activityLog}">이력</caption>
+                <caption>이력</caption>
                 <thead>
                 <tr>
                     <th>일시</th>

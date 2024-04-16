@@ -56,7 +56,7 @@
                             <tbody>
                             <tr th:each="gatheringMember : ${gatheringMembers}">
                                 <td th:text="${gatheringMember.member.nickname}"/>
-                                <td th:text="${gatheringMember.status}"/>
+                                <td th:text="${gatheringMember.isActive ? '참여중' : '나감'}"/>
                                 <td th:text="${#temporals.format(gatheringMember.createdAt,'yyyy-MM-dd HH:mm')}"/>
                                 <td th:text="${gatheringMember.amount}">
                                     <td>

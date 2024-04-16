@@ -5,59 +5,60 @@
 <main>
     <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
     <section class="content">
-        <form th:action="@{/admin/member/{id}/profile(id=${member_id})}" method="post">
         <div class="left-content">
-            <h1 th:text="${title_modify_member}">회원 수정</h1>
-            <label>
-                <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}(id=${member_id})} + '\''">뒤로가기</button>
-            </label>
-                <table>
 
-                    <thead>
-                    <tr>
-                        <th>회원번호</th>
-                        <th>SNS 타입</th>
-                        <th>닉네임</th>
-                        <th>나이(년생)</th>
-                        <th>성별</th>
-                        <th>회원상태</th>
-                        <th>가입일</th>
-                    </tr>
-                    </thead>
-                    <tbody th:if="${member != null}">
-                    <tr>
-                        <td th:text="${member.id}">1</td>
-                        <td th:text="${member.oauthProvider}">구글</td>
-                        <td><input type="text" th:name="nickname" th:value="${member.nickName}"></td>
-                        <td><input type="text" th:name="birthYear" th:value="${member.birthYear}"></td>
-<!--                        <td><input type="text" th:name="sex" th:value="${member.sex}"></td>-->
-                        <td>
-                            <select th:name="sex">
-                                <option value="NONE" th:selected="${member.sex.toString()  eq 'NONE'}">없음</option>
-                                <option value="MALE" th:selected="${member.sex.toString() eq 'MALE'}">남자</option>
-                                <option value="FEMALE" th:selected="${member.sex.toString()  eq 'FEMALE'}">여자</option>
-                            </select>
-                        </td>
-                        <td th:text="${member.isLeaved}">정상</td>
-                        <td th:text="${#temporals.format(member.createdAt,'yyyy-MM-dd HH:mm')}">2024-03-19</td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div class="activities">
+                <h1>회원 정보 수정</h1>
+                <label>
+                    <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}(id=${member.id})} + '\''">뒤로가기</button>
+                </label>
+                <form th:action="@{/admin/member/{id}/profile(id=${member_id})}" method="post">
+                <div>
+                    <table>
+                        <thead>
+                        <tr>
+                            <th>회원번호</th>
+                            <th>SNS 타입</th>
+                            <th>닉네임</th>
+                            <th>나이(년생)</th>
+                            <th>성별</th>
+                            <th>회원상태</th>
+                            <th>가입일</th>
+                        </tr>
+                        </thead>
+                        <tbody th:if="${member != null}">
+                        <tr>
+                            <td th:text="${member.id}">1</td>
+                            <td th:text="${member.oauthProvider}">구글</td>
+                            <td><input type="text" th:name="nickname" th:value="${member.nickName}"></td>
+                            <td><input type="text" th:name="birthYear" th:value="${member.birthYear}"></td>
+                            <td>
+                                <select th:name="sex">
+                                    <option value="NONE" th:selected="${member.sex.toString()  eq 'NONE'}">없음</option>
+                                    <option value="MALE" th:selected="${member.sex.toString() eq 'MALE'}">남자</option>
+                                    <option value="FEMALE" th:selected="${member.sex.toString()  eq 'FEMALE'}">여자</option>
+                                </select>
+                            </td>
+                            <td th:text="${member.isLeaved}">정상</td>
+                            <td th:text="${#temporals.format(member.createdAt,'yyyy-MM-dd HH:mm')}">2024-03-19</td>
+                        </tr>
+                        </tbody>
+                    </table>
 
-                <!-- CSRF 토큰 필드를 추가합니다. Spring Security를 사용하는 경우 필요합니다. -->
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-        </div>
-        <div class="left-bottom">
-            <div class="pagination">
-                <div>
-                    <button type="reset">취소</button>
-                </div>
-                <div>
-                    <button type="submit">저장</button>
-                </div>
+                    <!-- CSRF 토큰 필드를 추가합니다. Spring Security를 사용하는 경우 필요합니다. -->
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    </div>
+                    <div class="pagination">
+                        <div>
+                            <button type="reset">취소</button>
+                        </div>
+                        <div>
+                            <button type="submit">저장</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
-        </form>
     </section>
 </main>
 </body>

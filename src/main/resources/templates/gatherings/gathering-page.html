@@ -25,7 +25,7 @@
                                         th:selected="${condition.appTechPlatform() eq appTechPlatform}"/>
                             </select>
 
-                            <label for="gatheringStatus">SNS 종류:</label>
+                            <label for="gatheringStatus">상태:</label>
                             <select id="gatheringStatus" name="gatheringStatus">
                                 <option value="">전체</option>
                                 <option th:each="gatheringStatus : ${T(b172.challenging.gathering.domain.GatheringStatus).values()}"
@@ -39,9 +39,9 @@
                             <label for="searchCriteria">검색조건:</label>
                             <select id="searchCriteria" name="searchCriteria">
                                 <option value="">전체</option>
-                                <option th:value="nickname"
-                                        th:text="닉네임"
-                                        th:selected="${condition.searchCriteria() eq 'nickname'}" />
+                                <option th:value="owner_nickname"
+                                        th:text="방장"
+                                        th:selected="${condition.searchCriteria() eq 'owner_nickname'}" />
                                 <option th:value="title"
                                         th:text="제목"
                                         th:selected="${condition.searchCriteria() eq 'title'}" />
@@ -74,7 +74,7 @@
                             <th>시작일자</th>
                             <th>종료일자</th>
                             <th>기간</th>
-                            <th>회원상태</th>
+                            <th>진행 상태</th>
                         </tr>
                         </thead>
                         <tbody>
