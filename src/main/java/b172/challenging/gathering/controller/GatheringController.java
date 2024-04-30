@@ -1,8 +1,8 @@
 package b172.challenging.gathering.controller;
 
 
+import b172.challenging.common.dto.PageResponse;
 import b172.challenging.gathering.domain.AppTechPlatform;
-import b172.challenging.gathering.domain.GatheringMemberStatus;
 import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
 import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
@@ -47,26 +47,26 @@ public class GatheringController {
     })
     @Parameter(name = "status", description = "status : [PENDING] or [ONGOING, COMPLETED]", example = "TOSS")
     @Parameter(name = "platform", description = "platform : [TOSS, CASH_WORK, MONIMO, BALSO]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable(required = false) GatheringStatus status,
-                                                                 @PathVariable(required = false) AppTechPlatform platform,
-                                                                 @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
+    public ResponseEntity<PageResponse<GatheringResponseDto>> getGathering(@PathVariable(required = false) GatheringStatus status,
+                                                                           @PathVariable(required = false) AppTechPlatform platform,
+                                                                           @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         return ResponseEntity.ok(gatheringService.findGathering(status, platform,  page));
     }
 
-    @GetMapping(value = {"/my/{memberStatus}/{made}", "/my/{memberStatus}"})
+    @GetMapping(value = {"/my/{isActive}/{made}", "/my/{isActive}"})
     @Operation(summary = "나의 모임 가져오기", description = "내가 참여한 모임을 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
     @Parameter(name = "made" , description = "made : [] or [me]")
-    @Parameter(name = "memberStatus", description = "memberStatus : [ONGOING] or [PARTIALLY_LEFT, COMPLETED]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getMyGathering(@PathVariable GatheringMemberStatus memberStatus,
+    @Parameter(name = "isActive", description = "isActive : true , false", example = "true")
+    public ResponseEntity<PageResponse<GatheringResponseDto>> getMyGathering(@PathVariable Boolean isActive,
                                                                  @PathVariable(required = false) String made,
                                                                  Principal principal,
                                                                  @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
         Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.findMyGathering(memberId, memberStatus, made,  page));
+        return ResponseEntity.ok(gatheringService.findMyGathering(memberId, isActive, made,  page));
     }
 
     @GetMapping(value = "/platform")
@@ -95,14 +95,16 @@ public class GatheringController {
         return ResponseEntity.ok(gatheringService.makeGathering(memberId,gatheringMakeRequestDto));
     }
 
-    @GetMapping("/info/pending/{gatheringId}")
+    @GetMapping("/info/{gatheringStatus}/{gatheringId}")
     @Operation(summary = "모임 상세 정보", description = "모임 상세 정보를 가져옵니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
     })
+    @Parameter(name = "gatheringStatus" , description = "gatheringStatus : ongoing or pending")
     public ResponseEntity<PendingGatheringResponseDto> getPendingGathering(Principal principal,
-                                                                           @PathVariable Long gatheringId
+                                                                           @PathVariable Long gatheringId,
+                                                                           @PathVariable GatheringStatus gatheringStatus
     ){
         Long memberId = Long.parseLong(principal.getName());
         return ResponseEntity.ok(gatheringService.findPendingGathering(gatheringId, memberId));

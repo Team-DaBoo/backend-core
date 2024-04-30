@@ -39,7 +39,7 @@ public class ProTipController {
     })
     @Parameter(name = "type", description = "type : [YOUTUBE , BLOG, APP]")
     public ResponseEntity<PageResponse<ProTipResponseDto>> getProTip(@PathVariable(required = false) ProTipType type,
-                                                                    @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page,
+                                                                    @PageableDefault(size = 5, sort = "id,DESC") Pageable page,
                                                                     @AuthenticationPrincipal DefaultOAuth2User oauth2User) {
         CustomOauth2User customOauth2User = (CustomOauth2User) oauth2User;
         Role role = customOauth2User.getRole();

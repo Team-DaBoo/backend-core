@@ -50,10 +50,9 @@
                 </thead>
                 <tbody th:if="${statistics != null}">
                 <tr th:object="${statistics}">
-                    <td th:text="*{onGoingCount}"/>
                     <td><a th:href="@{/admin/gathering(searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{onGoingCount}"/></td>
-                    <td th:text="*{completedCount}"/>
-                    <td th:text="*{ownerGatheringCount}"/>
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='COMPLETED', searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{completedCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(searchCriteria='owner_nickname',searchQuery=${member.nickName})}" th:text="*{ownerGatheringCount}"/></td>
                     <td th:text="*{achievementRate}"/>
                 </tr>
                 </tbody>
@@ -69,7 +68,8 @@
                 <tbody th:if="${myHome != null}">
                 <tr>
                     <td th:text="${myHome}"/>
-                    <td th:text="${badgeCount}"/>
+<!--                    <td th:text="${badgeCount}"/>-->
+                    <td><a th:href="@{/admin/member/{id}/badge(id=${member.id})}" th:text="${badgeCount}"/></td>
                 </tr>
                 </tbody>
             </table>

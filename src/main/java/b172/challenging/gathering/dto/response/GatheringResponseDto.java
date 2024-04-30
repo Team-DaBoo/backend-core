@@ -20,8 +20,6 @@ public record GatheringResponseDto (
         Long goalAmount,
 
         int workingDays,
-
-
         int remainPeopleNum
 ) {
 

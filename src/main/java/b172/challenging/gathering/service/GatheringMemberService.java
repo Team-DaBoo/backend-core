@@ -50,7 +50,7 @@ public class GatheringMemberService {
         return new GatheringMemberResponseDto(
                 gatheringMember.getId(),
                 MemberResponseDto.from(gatheringMember.getMember()),
-                gatheringMember.getStatus(),
+                gatheringMember.getIsActive(),
                 gatheringMember.getAmount(),
                 gatheringMember.getCount(),
                 gatheringMember.getCreatedAt(),

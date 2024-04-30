@@ -48,7 +48,7 @@ public class MemberController {
         return ResponseEntity.ok(MemberProfileResponseDto.from(member));
     }
 
-    @PutMapping("/profile")
+    @PostMapping("/profile")
     @Operation(summary = "사용자 정보 수정", description = "토큰 정보에 해당하는 사용자 정보를 수정합니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공",
@@ -73,8 +73,8 @@ public class MemberController {
     })
     public ResponseEntity<MemberCheckNicknameResponseDto> checkMemberNickname(
             Principal principal,
-            @RequestBody @Valid MemberCheckNicknameRequestDto memberCheckNicknameRequestDto) {
+            @RequestParam String nickname) {
         Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(memberService.checkNickname(memberId, memberCheckNicknameRequestDto.nickname()));
+        return ResponseEntity.ok(memberService.checkNickname(memberId, nickname));
     }
 }

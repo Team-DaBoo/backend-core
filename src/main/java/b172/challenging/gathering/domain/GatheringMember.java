@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -35,10 +36,9 @@ public class GatheringMember extends BaseTimeEntity {
     @Schema(description = "가입한 사용자 ID")
     private Member member;
 
-    @Column(nullable = false, length = 20)
-    @Enumerated(EnumType.STRING)
-    @Schema(description = "가입한 상태")
-    private GatheringMemberStatus status;
+    @Column(nullable = false, columnDefinition = "boolean default true")
+    @Schema(description = "참여 중")
+    private Boolean isActive;
 
     @Column(nullable = false, columnDefinition = "bigint default 0")
     @Schema(description = "모은 금액")
@@ -48,14 +48,15 @@ public class GatheringMember extends BaseTimeEntity {
     @Schema(description = "모은 횟수")
     private int count;
 
+    @BatchSize(size = 10)
     @OneToMany(mappedBy = "gatheringMember", cascade = CascadeType.ALL)
     private List<GatheringSavingLog> gatheringSavingLogs;
     public void setGathering(Gathering gathering){
         this.gathering = gathering;
     }
 
-    public void setStatus(GatheringMemberStatus status){
-        this.status = status;
+    public void setIsActive(Boolean isActive){
+        this.isActive = isActive;
     }
 
     public void addSavingLog(GatheringSavingLog gatheringSavingLog){

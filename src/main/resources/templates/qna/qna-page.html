@@ -28,7 +28,7 @@
 
                             <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/qna} + '\'' + ')'">검색</button>
 
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
                             <input type="hidden" name="page" id="page" value="0" />
                             <input type="hidden" name="size" id="size" value="5" />
                         </div>

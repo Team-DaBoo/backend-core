@@ -42,7 +42,7 @@
                     <div></div>
                     <form id="actionForm" method="post">
                         <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/pro-tips/delete/{id}(id=${proTip.id})} + '\'' + ')'">삭제</button>
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
                     </form>
                 </div>
             </div>

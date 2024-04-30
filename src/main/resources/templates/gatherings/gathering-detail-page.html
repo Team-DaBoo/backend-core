@@ -70,7 +70,7 @@
                             </tr>
                             </tbody>
                         </table>
-                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                        <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
                         <div class="pagination">
                             <div>
                                 <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/gathering/{id}/delete(id=${gathering.id})} + '\'' + ')'">삭제</button>

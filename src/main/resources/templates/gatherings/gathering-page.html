@@ -45,6 +45,9 @@
                                 <option th:value="title"
                                         th:text="제목"
                                         th:selected="${condition.searchCriteria() eq 'title'}" />
+                                <option th:value="nickname"
+                                        th:text="참가자"
+                                        th:selected="${condition.searchCriteria() eq 'nickname'}" />
                             </select>
 
                             <label for="searchQuery">검색 내용:</label>
@@ -52,7 +55,7 @@
 
                             <button th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/gathering} + '\'' + ')'">검색</button>
 
-                            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                            <!-- <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" /> -->
                             <input type="hidden" name="page" id="page" value="0" />
                             <input type="hidden" name="size" id="size" value="5" />
                         </div>

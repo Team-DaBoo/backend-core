@@ -5,6 +5,7 @@ import b172.challenging.activitylog.dto.ActivityLogResponseDto;
 import b172.challenging.activitylog.service.ActivityService;
 import b172.challenging.admin.dto.MemberSearchRequestDto;
 import b172.challenging.badge.service.BadgeService;
+import b172.challenging.gathering.dto.response.GatheringStatisticsResponseDto;
 import b172.challenging.gathering.service.GatheringService;
 import b172.challenging.member.domain.Member;
 import b172.challenging.member.dto.request.MemberProfileUpdateRequestDto;
@@ -61,13 +62,10 @@ public class AdminController {
         Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
         PageResponse<ActivityLogResponseDto> activityLogs = activityService.findActivityLog(memberId,null,pageable);
         List<ActivityLogResponseDto> activityLogResponseDtoList = activityLogs.list();
+        GatheringStatisticsResponseDto statistics = gatheringService.gatheringStatistics(memberId);
 
-        model.addAttribute("title_member", "기본 정보");
-        model.addAttribute("title_gathering", "모임 현황");
-        model.addAttribute("title_etc", "기타");
-        model.addAttribute("title_activityLog", "이력");
         model.addAttribute("member", MemberProfileResponseDto.from(member));
-        model.addAttribute("statics", gatheringService.gatheringStatistics(memberId));
+        model.addAttribute("statistics", statistics);
         model.addAttribute("myHome", myHome);
         model.addAttribute("badgeCount", badgeCount);
         model.addAttribute("activityLogs", activityLogResponseDtoList);
@@ -100,7 +98,6 @@ public class AdminController {
     @GetMapping("/{id}/profile")
     public String memberProfilePage(Model model, @PathVariable Long id) {
         Member member = memberService.findMemberById(id);
-        model.addAttribute("title_modify_member", "회원 정보 수정");
         model.addAttribute("member_id", id);
         model.addAttribute("member", MemberProfileResponseDto.from(member));
         return "member/member-profile-page";
@@ -116,4 +113,27 @@ public class AdminController {
         model.addAttribute("member", MemberProfileResponseDto.from(member));
         return "member/member-profile-page";
     }
+
+    @GetMapping("/{id}/badge")
+    public String badgePage(Model model, @PathVariable Long id) {
+        model.addAttribute("badges",badgeService.findMemberBadgeList(id));
+        model.addAttribute("member_id",id);
+
+        return "member/member-badge-page";
+    }
+
+    @PostMapping("/{id}/badge/insert/{badgeId}")
+    public String badgeInsert(@PathVariable Long id,
+                              @PathVariable Long badgeId) {
+        badgeService.insertMemberBadge(id,badgeId);
+        return "redirect:/admin/member/"+id+"/badge";
+    }
+
+    @PostMapping("/{id}/badge/delete/{badgeId}")
+    public String badgeDelete(@PathVariable Long id,
+                              @PathVariable Long badgeId) {
+        badgeService.deleteMemberBadge(id,badgeId);
+        return "redirect:/admin/member/"+id+"/badge";
+    }
+
 }

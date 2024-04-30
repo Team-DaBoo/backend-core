@@ -3,11 +3,9 @@ package b172.challenging.admin.controller;
 import b172.challenging.admin.dto.GatheringSearchRequestDto;
 import b172.challenging.common.dto.PageResponse;
 import b172.challenging.gathering.domain.AppTechPlatform;
-import b172.challenging.gathering.domain.GatheringStatus;
 import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
 import b172.challenging.gathering.dto.request.GatheringSavingLogRequestDto;
 import b172.challenging.gathering.dto.response.GatheringMemberResponseDto;
-import b172.challenging.gathering.dto.response.GatheringPageResponseDto;
 import b172.challenging.gathering.dto.response.GatheringResponseDto;
 import b172.challenging.gathering.service.GatheringMemberService;
 import b172.challenging.gathering.service.GatheringSavingLogService;
@@ -65,6 +63,7 @@ public class AdminGatheringController {
         return "gatherings/gathering-detail-page";
     }
 
+    // ToDo
     @PostMapping("/{gatheringId}/edit")
     public String gatheringEdit(Long memberId,
                                 @PathVariable Long gatheringId,

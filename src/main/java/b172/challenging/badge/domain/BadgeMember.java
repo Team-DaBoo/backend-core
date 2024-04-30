@@ -4,6 +4,7 @@ import b172.challenging.common.domain.BaseTimeEntity;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,4 +31,11 @@ public class BadgeMember extends BaseTimeEntity {
     @JoinColumn(name = "badge_id", nullable = false)
     @Schema(description = "배지 ID")
     private Badge badge;
+
+    @Builder
+    public BadgeMember(Long id, Badge badge, Member member) {
+        this.id = id;
+        this.badge = badge;
+        this.member = member;
+    }
 }
