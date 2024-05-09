@@ -185,12 +185,14 @@ public class GatheringService {
         Member member = memberRepository.findById(memberId)
                 .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
 
-        Long onGoingCount = gatheringMemberRepository.countByMemberIdAndGathering_StatusNot(memberId, GatheringStatus.COMPLETED);
+        Long pendingCount = gatheringMemberRepository.countByMemberIdAndGathering_Status(memberId, GatheringStatus.PENDING);
+        Long onGoingCount = gatheringMemberRepository.countByMemberIdAndGathering_Status(memberId, GatheringStatus.ONGOING);
         Long completedCount = gatheringMemberRepository.countByMemberIdAndGathering_Status(memberId, GatheringStatus.COMPLETED);
         Long ownerGatheringCount = gatheringRepository.countByOwnerMember(member);
         Double achievementRate = getAchievementRate(member);
 
         return GatheringStatisticsResponseDto.builder()
+                .pendingCount(pendingCount)
                 .onGoingCount(onGoingCount)
                 .completedCount(completedCount)
                 .ownerGatheringCount(ownerGatheringCount)

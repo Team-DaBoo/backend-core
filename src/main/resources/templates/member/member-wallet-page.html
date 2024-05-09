@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <h1>나의 집 상세</h1>
+            <label>
+                <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}(id=${member_id})} + '\''">뒤로가기</button>
+            </label>
+            <table>
+                <caption>나의 집 관리</caption>
+                <thead>
+                <tr>
+                    <th>나의 집 이름</th>
+                    <th>상태</th>
+                    <th>현재 포인트</th>
+                    <th>총 포인트</th>
+                    <th>포인트 추가 지급</th>
+                </tr>
+                </thead>
+                <tbody >
+                <tr th:each="wallet : ${wallet}">
+                    <td th:text="${wallet.myHomeName()}"/>
+                    <td th:text="${wallet.myHome.name()}"/>
+                    <td th:text="${wallet.point()}"/>
+                    <td th:text="${wallet.saveAmount()}"/>
+                    <td>
+                        <form id="actionForm" method="post" th:action="@{/admin/member/{id}/wallet/update/{walletId}(id=${member_id},walletId=${wallet.id()})}">
+                            <label>
+                                <input th:type="text" th:id="amount" th:name="amount" th:placeholder="0"/> 원
+                            </label>
+                            <button type="submit">추가</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <caption>자재 구입 현황</caption>
+                <thead>
+                <tr>
+                    <th>자재 이름</th>
+                    <th>모은 개수</th>
+                    <th>필요 량</th>
+                    <th>추가 지급</th>
+                </tr>
+                </thead>
+                <tbody >
+                <tr th:each="material : ${materialList}">
+                    <td th:text="${material.homeMaterial().name()}"/>
+                    <td th:text="${material.collected()}"/>
+                    <td th:text="${material.homeMaterial().needed()}"/>
+                    <td>
+                        <form id="actionForm" method="post" th:action="@{/admin/member/{id}/material/update/{materialWalletId}(id=${member_id},materialWalletId=${material.id()})}">
+                            <label>
+                                <input th:type="text" th:id="amount" th:name="amount" th:placeholder="0"/> 개
+                            </label>
+                            <button type="submit">추가</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

@@ -4,6 +4,7 @@ import b172.challenging.myhome.domain.HomeMaterial;
 import b172.challenging.member.domain.Member;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -32,4 +33,16 @@ public class MaterialWallet {
     @Column(name = "collected", nullable = false, columnDefinition = "bigint default 0")
     @Schema(description = "모은 양")
     private Long collected;
+
+    @Builder
+    public MaterialWallet(Long id, Member member, HomeMaterial homeMaterial, Long collected) {
+        this.id = id;
+        this.member = member;
+        this.homeMaterial = homeMaterial;
+        this.collected = collected;
+    }
+
+    public void saveMaterial(Long amount) {
+        this.collected += amount;
+    }
 }

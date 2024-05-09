@@ -49,14 +49,14 @@ public class GatheringCustomRepositoryImpl implements GatheringCustomRepository 
             query.join(member).on(gathering.ownerMember.eq(member));
         }
 
-        long total = query.fetchCount();
-
         query
                 .offset(pageable.getOffset()) // 페이지 시작 위치
                 .limit(pageable.getPageSize()) // 페이지 크기
                 .orderBy(gathering.id.desc());
 
         List<Gathering> gatheringList = query.fetch();
+
+        long total = query.fetch().size();
 
         return new PageImpl<>(gatheringList, pageable, total);
     }

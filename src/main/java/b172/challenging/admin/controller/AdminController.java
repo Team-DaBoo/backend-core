@@ -136,4 +136,24 @@ public class AdminController {
         return "redirect:/admin/member/"+id+"/badge";
     }
 
+    @GetMapping("{id}/wallet")
+    public String myHomePage(Model model, @PathVariable Long id) {
+        model.addAttribute("wallet",walletService.findMyWallet(id));
+        model.addAttribute("materialList",walletService.findMyMaterialWallet(id));
+        model.addAttribute("member_id",id);
+        return "member/member-wallet-page";
+    }
+
+    @PostMapping("/{id}/wallet/update/{walletId}")
+    public String updateMyHome(@PathVariable Long id, @PathVariable Long walletId, Long amount) {
+        walletService.updateWallet(walletId, amount);
+        return "redirect:/admin/member/"+id+"/wallet";
+    }
+
+    @PostMapping("/{id}/material/update/{materialWalletId}")
+    public String updateHomeMaterial(@PathVariable Long id, @PathVariable Long materialWalletId, Long amount) {
+        walletService.updateHomeMaterial(materialWalletId, amount);
+        return "redirect:/admin/member/"+id+"/wallet";
+    }
+
 }

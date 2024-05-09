@@ -42,7 +42,9 @@
                 <caption>모임 현황</caption>
                 <thead>
                 <tr>
-                    <th>참여중</th>
+<!--                    <th>참여중</th>-->
+                    <th>시작전</th>
+                    <th>진행중</th>
                     <th>완료</th>
                     <th>만든모임</th>
                     <th>달성률</th>
@@ -50,7 +52,8 @@
                 </thead>
                 <tbody th:if="${statistics != null}">
                 <tr th:object="${statistics}">
-                    <td><a th:href="@{/admin/gathering(searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{onGoingCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='PENDING')}" th:text="*{pendingCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='ONGOING')}" th:text="*{onGoingCount}"/></td>
                     <td><a th:href="@{/admin/gathering(gatheringStatus='COMPLETED', searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{completedCount}"/></td>
                     <td><a th:href="@{/admin/gathering(searchCriteria='owner_nickname',searchQuery=${member.nickName})}" th:text="*{ownerGatheringCount}"/></td>
                     <td th:text="*{achievementRate}"/>
@@ -67,8 +70,9 @@
                 </thead>
                 <tbody th:if="${myHome != null}">
                 <tr>
-                    <td th:text="${myHome}"/>
+<!--                    <td th:text="${myHome}"/>-->
 <!--                    <td th:text="${badgeCount}"/>-->
+                    <td><a th:href="@{/admin/member/{id}/wallet(id=${member.id})}" th:text="${myHome}"/></td>
                     <td><a th:href="@{/admin/member/{id}/badge(id=${member.id})}" th:text="${badgeCount}"/></td>
                 </tr>
                 </tbody>

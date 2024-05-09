@@ -34,6 +34,7 @@ function submitFormWithAction(action) {
     if (!confirmed) {
         return confirmed;
     }
+
     let form = document.getElementById('actionForm');
     form.action = action; // 폼의 action 속성을 동적으로 변경
     form.submit(); // 폼 제출
