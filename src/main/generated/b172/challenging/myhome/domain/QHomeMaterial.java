@@ -24,8 +24,6 @@ public class QHomeMaterial extends EntityPathBase<HomeMaterial> {
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
-    public final ListPath<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet> materialWallet = this.<b172.challenging.wallet.domain.MaterialWallet, b172.challenging.wallet.domain.QMaterialWallet>createList("materialWallet", b172.challenging.wallet.domain.MaterialWallet.class, b172.challenging.wallet.domain.QMaterialWallet.class, PathInits.DIRECT2);
-
     public final QMyHome myHome;
 
     public final StringPath name = createString("name");

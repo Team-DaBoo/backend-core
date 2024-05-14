@@ -22,13 +22,19 @@ public class QBadgeMember extends EntityPathBase<BadgeMember> {
 
     public static final QBadgeMember badgeMember = new QBadgeMember("badgeMember");
 
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
     public final QBadge badge;
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final b172.challenging.member.domain.QMember member;
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QBadgeMember(String variable) {
         this(BadgeMember.class, forVariable(variable), INITS);

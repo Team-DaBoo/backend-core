@@ -1,9 +1,10 @@
 package b172.challenging.gathering.dto.response;
 
-import lombok.Builder;
-
-@Builder
-public record GatheringSavingLogCertificateResponseDto (
-        Long amount,
-        String imgUrl
-){ }
+public record GatheringSavingLogCertificateResponseDto(
+	Long amount,
+	String imgUrl
+) {
+	public static GatheringSavingLogCertificateResponseDto from(Long amount, String imgUrl) {
+		return new GatheringSavingLogCertificateResponseDto(amount, imgUrl);
+	}
+}

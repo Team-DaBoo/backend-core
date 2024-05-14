@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+        <div class="left-content">
+            <div class="activities">
+                <h1>공지사항 관리</h1>
+                <div>
+                    <label>
+                        <button th:onclick="'window.location.href=\'' + @{/admin/announcements} + '\''">뒤로 가기</button>
+                    </label>
+                    <table>
+                        <caption>공지사항 관리</caption>
+                    </table>
+
+                    <div th:name="title" th:text="'제목 :   '+ ${announcements.title}"/>
+                    <br><hr><br>
+                    <div th:text="'내용'"/>
+                    <br><br>
+                    <div th:utext="${announcements.content}"></div>
+                    <br><hr><br>
+                    <div>
+                        <label>사용 여부:&nbsp;&nbsp;&nbsp;</label>
+                        <label th:if="${announcements.useYn.toString() eq 'Y'}">사용</label>
+                        <label th:if="${announcements.useYn.toString() eq 'N'}">미사용</label>
+                    </div>
+                    <br><hr><br>
+                </div>
+                <div class="pagination">
+                    <div>
+                        <button th:type="button" th:onclick="'window.location.href=\'' + @{/admin/announcements/update/{id}(id=${announcements.id})} + '\''">수정</button>
+                    </div>
+                    <div></div>
+                    경
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+<footer th:replace="~{fragments/footer :: footerFragment}"></footer>
+</body>
+</html>

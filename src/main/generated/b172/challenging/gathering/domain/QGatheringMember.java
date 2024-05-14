@@ -22,11 +22,14 @@ public class QGatheringMember extends EntityPathBase<GatheringMember> {
 
     public static final QGatheringMember gatheringMember = new QGatheringMember("gatheringMember");
 
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
     public final NumberPath<Long> amount = createNumber("amount", Long.class);
 
     public final NumberPath<Integer> count = createNumber("count", Integer.class);
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final QGathering gathering;
 
@@ -38,7 +41,8 @@ public class QGatheringMember extends EntityPathBase<GatheringMember> {
 
     public final EnumPath<GatheringMemberStatus> status = createEnum("status", GatheringMemberStatus.class);
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QGatheringMember(String variable) {
         this(GatheringMember.class, forVariable(variable), INITS);

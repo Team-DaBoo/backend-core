@@ -28,6 +28,8 @@ public class QGatheringSavingLog extends EntityPathBase<GatheringSavingLog> {
 
     public final QGatheringMember gatheringMember;
 
+    public final ListPath<GatheringSavingCertification, QGatheringSavingCertification> gatheringSavingCertifications = this.<GatheringSavingCertification, QGatheringSavingCertification>createList("gatheringSavingCertifications", GatheringSavingCertification.class, QGatheringSavingCertification.class, PathInits.DIRECT2);
+
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public QGatheringSavingLog(String variable) {

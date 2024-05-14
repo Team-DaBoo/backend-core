@@ -1,51 +1,56 @@
 package b172.challenging.badge.service;
 
-import b172.challenging.member.domain.Member;
-import b172.challenging.member.repository.MemberRepository;
-import b172.challenging.badge.domain.Badge;
-import b172.challenging.badge.dto.response.BadgeMemberResponseDto;
-import b172.challenging.badge.dto.response.BadgeResponseDto;
-import b172.challenging.badge.repository.BadgeCustomRepository;
-import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.Exceptions;
-import com.querydsl.core.Tuple;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.util.List;
+
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import b172.challenging.badge.domain.Badge;
+import b172.challenging.badge.domain.BadgeMember;
+import b172.challenging.badge.dto.response.BadgeDto;
+import b172.challenging.badge.repository.BadgeMemberRepository;
+import b172.challenging.badge.repository.BadgeRepository;
+import b172.challenging.member.domain.Member;
+import b172.challenging.member.repository.MemberRepository;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class BadgeService {
 
-    private final MemberRepository memberRepository;
-    private final BadgeCustomRepository badgeCustomRepository;
+	private final BadgeMemberRepository badgeMemberRepository;
+	private final BadgeRepository badgeRepository;
+	private final MemberRepository memberRepository;
 
-    public BadgeMemberResponseDto findMemberBadgeList(Long memberId) {
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() ->  new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+	public List<BadgeDto> findMemberBadgeList(Long memberId) {
+		List<Badge> badgeList = badgeRepository.findAll();
 
-        List<Tuple> badgeMemberList = badgeCustomRepository.findBadgeMemberWithBadgeByMemberId(memberId);
+		return badgeList.stream().map(
+			badge -> new BadgeDto(
+				badge.getId(),
+				badge.getName(),
+				badge.getDescription(),
+				badgeMemberRepository.existsByBadgeIdAndMemberId(badge.getId(), memberId)
+			)
+		).toList();
+	}
 
-        List<BadgeResponseDto> badgeResponseDtos = badgeMemberList.stream()
-                .map(tuple -> {
-                    Badge badge = tuple.get(0, Badge.class);
-                    Boolean hasBadge = tuple.get(1, Boolean.class);
-                    return new BadgeResponseDto(
-                            badge.getId(),
-                            badge.getName(),
-                            badge.getDescription(),
-                            badge.getImageUrl(),
-                            hasBadge
-                    );
-                })
-                .collect(Collectors.toList());
+	public int countBadgeByMemberId(Long memberId) {
+		return badgeMemberRepository.countByMemberId(memberId);
+	}
 
-        return BadgeMemberResponseDto.builder()
-                .badges(badgeResponseDtos)
-                .build();
-    }
+	public void deleteMemberBadge(Long memberId, Long badgeId) {
+		badgeMemberRepository.delete(
+			badgeMemberRepository.findByBadgeIdAndMemberId(badgeId, memberId)
+		);
+	}
+
+	public void insertMemberBadge(Long memberId, Long badgeId) {
+		Member member = memberRepository.getOrThrow(memberId);
+		Badge badge = badgeRepository.findById(badgeId).orElseThrow();
+		BadgeMember badgeMember = BadgeMember.builder().badge(badge).member(member).build();
+		badgeMemberRepository.save(badgeMember);
+	}
 }

@@ -19,21 +19,13 @@ public class QBadge extends EntityPathBase<Badge> {
 
     public static final QBadge badge = new QBadge("badge");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
-
     public final StringPath description = createString("description");
-
-    public final StringPath hasImageUrl = createString("hasImageUrl");
 
     public final NumberPath<Long> id = createNumber("id", Long.class);
 
     public final StringPath imageUrl = createString("imageUrl");
 
     public final StringPath name = createString("name");
-
-    public final StringPath slug = createString("slug");
-
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
 
     public QBadge(String variable) {
         super(Badge.class, forVariable(variable));

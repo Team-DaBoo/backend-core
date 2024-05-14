@@ -22,7 +22,10 @@ public class QAppToken extends EntityPathBase<AppToken> {
 
     public static final QAppToken appToken = new QAppToken("appToken");
 
-    public final DateTimePath<java.time.LocalDateTime> createdAt = createDateTime("createdAt", java.time.LocalDateTime.class);
+    public final b172.challenging.common.domain.QBaseTimeEntity _super = new b172.challenging.common.domain.QBaseTimeEntity(this);
+
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> createdAt = _super.createdAt;
 
     public final StringPath device = createString("device");
 
@@ -34,7 +37,8 @@ public class QAppToken extends EntityPathBase<AppToken> {
 
     public final StringPath token = createString("token");
 
-    public final DateTimePath<java.time.LocalDateTime> updatedAt = createDateTime("updatedAt", java.time.LocalDateTime.class);
+    //inherited
+    public final DateTimePath<java.time.LocalDateTime> updatedAt = _super.updatedAt;
 
     public QAppToken(String variable) {
         this(AppToken.class, forVariable(variable), INITS);

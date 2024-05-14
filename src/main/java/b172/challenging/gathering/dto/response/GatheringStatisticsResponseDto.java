@@ -4,8 +4,10 @@ import lombok.Builder;
 
 @Builder
 public record GatheringStatisticsResponseDto(
-    Long onGoingCount,
-    Long completedCount,
-    Long ownerGatheringCount,
-    Double achievementRate
-    ){ }
+	Long pendingCount,
+	Long onGoingCount,
+	Long completedCount,
+	Long ownerGatheringCount,
+	Double achievementRate
+) {
+}

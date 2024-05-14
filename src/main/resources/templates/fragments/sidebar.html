@@ -1,0 +1,50 @@
+<nav th:fragment="sidebarFragment" xmlns:th="http://www.w3.org/1999/xhtml" class="main-menu">
+    <h1>DaBoo App</h1>
+    <img class="logo" src="https://github.com/ecemgo/mini-samples-great-tricks/assets/13468728/4cfdcb5a-0137-4457-8be1-6e7bd1f29ebb" alt="" />
+    <ul>
+        <li class="nav-item">
+            <b></b>
+            <b></b>
+            <a th:href="@{/admin/member}">
+                <i class="fa fa-user nav-icon"></i>
+                <span class="nav-text">회원 관리</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <b></b>
+            <b></b>
+            <a th:href="@{/admin/gathering}">
+                <i class="fa fa-gathering nav-icon"></i>
+                <span class="nav-text">방 관리</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <b></b>
+            <b></b>
+            <a th:href="@{/admin/pro-tips}">
+                <i class="fa pro-tip-board nav-icon"></i>
+                <span class="nav-text">꿀팁 게시판 관리</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <b></b>
+            <b></b>
+            <a th:href="@{/admin/announcements}">
+                <i class="fa fa-notification nav-icon"></i>
+                <span class="nav-text">공지사항 관리</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <b></b>
+            <b></b>
+            <a th:href="@{/admin/qna}">
+                <i class="fa fa-q-n-a nav-icon"></i>
+                <span class="nav-text">Q&A 관리</span>
+            </a>
+        </li>
+    </ul>
+</nav>

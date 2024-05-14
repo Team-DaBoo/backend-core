@@ -1,21 +1,15 @@
 package b172.challenging.auth.oauth.filter;
 
-import b172.challenging.auth.oauth.CustomOauth2User;
-import b172.challenging.common.exception.ExceptionResponseDto;
-import b172.challenging.member.repository.MemberRepository;
-import b172.challenging.member.domain.Member;
-import b172.challenging.auth.service.CustomOauthService;
-import b172.challenging.auth.service.JwtService;
-import b172.challenging.common.exception.CustomRuntimeException;
-import b172.challenging.common.exception.Exceptions;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Map;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.MediaType;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,123 +17,104 @@ import org.springframework.security.oauth2.client.authentication.OAuth2Authentic
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+import b172.challenging.auth.oauth.CustomOauth2User;
+import b172.challenging.auth.service.JwtService;
+import b172.challenging.common.exception.CustomRuntimeException;
+import b172.challenging.common.exception.Exceptions;
+import b172.challenging.member.domain.Member;
+import b172.challenging.member.repository.MemberRepository;
 
 @Slf4j
 @RequiredArgsConstructor
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final String ALLOW_PATH = "/login";
+	private final JwtService jwtService;
+	private final MemberRepository memberRepository;
 
-    private final JwtService jwtService;
-    private final MemberRepository memberRepository;
-    private CustomOauthService customOauthService;
+	@Override
+	protected void doFilterInternal(
+		HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
+	) throws ServletException, IOException {
 
+		if (!request.getServletPath().startsWith("/v1") && !request.getServletPath().startsWith("/admin")) {
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-    @Override
-    protected void doFilterInternal(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
-    ) throws ServletException, IOException {
-        try {
-            if (request.getRequestURI().equals(ALLOW_PATH)) {
-                filterChain.doFilter(request, response);
-                return;
-            }
-            String refreshToken = jwtService.extractRefreshToken(request)
-                    .filter(jwtService::verifyToken)
-                    .orElse(null);
-            /**
-             * refresh token 전송시 access, refresh token 모두 재발급
-             */
-            if (refreshToken != null) {
-                try {
-                    checkRefreshTokenAndReIssueTokens(response, refreshToken);
-                } catch (CustomRuntimeException e) {
-                    throw e;
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-                return;
-            }
-            checkAccessTokenAndAuthentication(request, response, filterChain);
-        } catch (CustomRuntimeException e) {
-            log.error(e.getMessage());
-                setExceptionResponse(response, Exceptions.UNAUTHORIZED);
-        }
-    }
+		// ACCESS_TOKEN 확인
+		String accessToken = request.getHeader(jwtService.getAccessHeader()) != null
+			? request.getHeader(jwtService.getAccessHeader()).replace("Bearer ", "")
+			: null;
 
-    private void setExceptionResponse(HttpServletResponse response, Exceptions e) throws RuntimeException, IOException {
-        response.setCharacterEncoding("UTF-8");
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        response.setStatus(e.getStatusCode());
+		if (accessToken != null && jwtService.verifyToken(accessToken)) {
+			Long memberId = jwtService.extractMemberId(accessToken);
+			String jwtCode = jwtService.extractJwtCode(accessToken);
+			Member member = verifyJwtCodeAndAuthenticate(memberId, jwtCode);
+			saveAuthentication(member);
+			filterChain.doFilter(request, response);
+			return;
+		}
 
-        ObjectMapper objectMapper = new ObjectMapper();
-        ExceptionResponseDto responseDto = ExceptionResponseDto.of(
-                e.getStatusCode(),
-                e.getErrorCode(),
-                e.getMessage()
-        );
+		// REFRESH_TOKEN 확인
+		String refreshToken = null;
+		Cookie[] cookies = request.getCookies();
+		if (cookies != null) {
+			for (Cookie cookie : cookies) {
+				if (cookie.getName().equals(jwtService.getRefreshHeader())) {
+					refreshToken = cookie.getValue();
+				}
+			}
+		}
 
-        String jsonResponse = objectMapper.writeValueAsString(responseDto);
-        response.getWriter().write(jsonResponse);
-    }
+		if (refreshToken != null && jwtService.verifyToken(refreshToken)) {
+			checkRefreshTokenAndReIssueTokens(response, refreshToken);
+		}
 
-    public void checkRefreshTokenAndReIssueTokens(HttpServletResponse response, String refreshToken) throws Exception {
-        Long memberId = jwtService.extractMemberId(refreshToken);
-        Member member = memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
+		filterChain.doFilter(request, response);
+	}
 
-        String storedJwtCode = member.getJwtCode();
+	public void checkRefreshTokenAndReIssueTokens(HttpServletResponse response, String refreshToken) throws
+		IOException,
+		IllegalArgumentException {
+		Long memberId = jwtService.extractMemberId(refreshToken);
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new CustomRuntimeException(Exceptions.NOT_FOUND_MEMBER));
 
-        String tokenJwtCode = jwtService.extractJwtCode(refreshToken);
-        if (!tokenJwtCode.equals(storedJwtCode)) {
-            new CustomRuntimeException(Exceptions.UNAUTHORIZED);
-        }
-        jwtService.sendAccessAndRefreshToken(
-                response, jwtService.createAccessToken(memberId, member.getRole()), jwtService.createRefreshToken(memberId)
-        );
-    }
+		String storedJwtCode = member.getJwtCode();
+		String tokenJwtCode = jwtService.extractJwtCode(refreshToken);
 
-    public void checkAccessTokenAndAuthentication(
-            HttpServletRequest request, HttpServletResponse response, FilterChain filterChain
-    ) throws ServletException, IOException {
-        jwtService.extractAccessToken(request)
-                .filter(jwtService::verifyToken)
-                .ifPresent(accessToken -> {
-                    try {
-                        Long memberId = jwtService.extractMemberId(accessToken);
-                        String jwtCode = jwtService.extractJwtCode(accessToken);
-                        Member member = verifyJwtCodeAndAuthenticate(memberId, jwtCode);
-                        saveAuthentication(member);
-                    } catch (CustomRuntimeException e) {
-                        throw e;
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                });
-        filterChain.doFilter(request, response);
-    }
+		if (!tokenJwtCode.equals(storedJwtCode)) {
+			throw new CustomRuntimeException(Exceptions.UNAUTHORIZED);
+		}
 
-    public Member verifyJwtCodeAndAuthenticate(Long memberId, String jwtCode) {
-        memberRepository.findJwtCodeById(memberId)
-                .filter(savedJwtCode -> savedJwtCode.equals(jwtCode))
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.UNAUTHORIZED));
-        return memberRepository.findById(memberId)
-                .orElseThrow(() -> new CustomRuntimeException(Exceptions.UNAUTHORIZED));
-    }
+		String newAccessToken = jwtService.createAccessToken(memberId, member.getRole());
+		String newRefreshToken = jwtService.createRefreshToken(memberId);
+		jwtService.sendAccessAndRefreshToken(
+			response, newAccessToken, newRefreshToken
+		);
+		saveAuthentication(member);
+	}
 
-    public void saveAuthentication(Member member) {
-        CustomOauth2User customOauth2User = new CustomOauth2User(
-                Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey())),
-                Map.of("memberId", member.getId()),
-                "memberId",
-                member.getId(),
-                member.getRole()
-        );
-        Authentication authentication = new OAuth2AuthenticationToken(customOauth2User, customOauth2User.getAuthorities(), "memberId");
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-    }
+	public Member verifyJwtCodeAndAuthenticate(Long memberId, String jwtCode) {
+		return memberRepository.findById(memberId)
+			.filter(savedJwtCode -> savedJwtCode.getJwtCode().equals(jwtCode))
+			.orElseThrow(() -> new CustomRuntimeException(Exceptions.UNAUTHORIZED));
+	}
+
+	public void saveAuthentication(Member member) {
+		CustomOauth2User customOauth2User = new CustomOauth2User(
+			Collections.singleton(new SimpleGrantedAuthority(member.getRole().getKey())),
+			Map.of("memberId", member.getId()),
+			"memberId",
+			member.getId(),
+			member.getRole()
+		);
+		Authentication authentication = new OAuth2AuthenticationToken(customOauth2User,
+			customOauth2User.getAuthorities(), "memberId");
+		SecurityContextHolder.getContext().setAuthentication(authentication);
+	}
 }

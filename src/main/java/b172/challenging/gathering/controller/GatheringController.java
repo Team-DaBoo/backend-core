@@ -1,19 +1,24 @@
 package b172.challenging.gathering.controller;
 
+import java.security.Principal;
 
-import b172.challenging.gathering.domain.AppTechPlatform;
-import b172.challenging.gathering.domain.GatheringMemberStatus;
-import b172.challenging.gathering.domain.GatheringStatus;
-import b172.challenging.gathering.dto.GatheringMemberDto;
-import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
-import b172.challenging.gathering.dto.response.GatheringSavingLogResponseDto;
-import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
-import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
-import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
-import b172.challenging.gathering.dto.request.GatheringSavingLogRequestDto;
-import b172.challenging.gathering.dto.response.*;
-import b172.challenging.gathering.service.GatheringSavingLogService;
-import b172.challenging.gathering.service.GatheringService;
+import jakarta.validation.Valid;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import lombok.RequiredArgsConstructor;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -21,16 +26,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.gathering.domain.AppTechPlatform;
+import b172.challenging.gathering.domain.GatheringStatus;
+import b172.challenging.gathering.dto.request.GatheringMakeRequestDto;
+import b172.challenging.gathering.dto.request.GatheringSavingLogRequestDto;
+import b172.challenging.gathering.dto.response.AppTechPlatformDto;
+import b172.challenging.gathering.dto.response.GatheringMakeResponseDto;
+import b172.challenging.gathering.dto.response.GatheringMemberResponseDto;
+import b172.challenging.gathering.dto.response.GatheringOtherMemberResponseDto;
+import b172.challenging.gathering.dto.response.GatheringResponseDto;
+import b172.challenging.gathering.dto.response.GatheringSavingLogCertificateResponseDto;
+import b172.challenging.gathering.dto.response.GatheringStatisticsResponseDto;
+import b172.challenging.gathering.dto.response.OngoingGatheringResponseDto;
+import b172.challenging.gathering.dto.response.PendingGatheringResponseDto;
+import b172.challenging.gathering.service.GatheringSavingLogService;
+import b172.challenging.gathering.service.GatheringService;
 
 @Tag(name = "함께 모으기 API", description = "함께 모으기 (홈 화면) API")
 @RestController
@@ -38,158 +50,179 @@ import java.security.Principal;
 @RequestMapping("/v1/gathering")
 public class GatheringController {
 
-    private final GatheringService gatheringService;
-    private final GatheringSavingLogService gatheringSavingLogService;
+	private final GatheringService gatheringService;
+	private final GatheringSavingLogService gatheringSavingLogService;
 
-    @GetMapping(value = {"/{status}/{platform}", "/{status}"})
-    @Operation(summary = "PlatForm 에 따른 전체 모임 가져오기", description = "AppPlatForm 가져옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    @Parameter(name = "status", description = "status : [PENDING] or [ONGOING, COMPLETED]", example = "TOSS")
-    @Parameter(name = "platform", description = "platform : [TOSS, CASH_WORK, MONIMO, BALSO]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getGathering(@PathVariable GatheringStatus status,
-                                                                 @PathVariable(required = false) AppTechPlatform platform,
-                                                                 @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
-        return ResponseEntity.ok(gatheringService.findGathering(status, platform,  page));
-    }
+	@GetMapping(value = {"/{status}/{platform}", "/{status}"})
+	@Operation(summary = "PlatForm 에 따른 전체 모임 가져오기", description = "AppPlatForm 가져옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	@Parameter(name = "status", description = "status : [PENDING] or [ONGOING, COMPLETED]", example = "TOSS")
+	@Parameter(name = "platform", description = "platform : [TOSS, CASH_WORK, MONIMO, BALSO]", example = "TOSS")
+	public ResponseEntity<PageResponse<GatheringResponseDto>> getGathering(
+		@PathVariable(required = false) GatheringStatus status,
+		@PathVariable(required = false) AppTechPlatform platform,
+		@PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
+		return ResponseEntity.ok(gatheringService.findGathering(status, platform, page));
+	}
 
-    @GetMapping(value = {"/my/{memberStatus}/{made}", "/my/{memberStatus}"})
-    @Operation(summary = "나의 모임 가져오기", description = "내가 참여한 모임을 가져옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    @Parameter(name = "made" , description = "made : [] or [me]")
-    @Parameter(name = "memberStatus", description = "memberStatus : [ONGOING] or [PARTIALLY_LEFT, COMPLETED]", example = "TOSS")
-    public ResponseEntity<GatheringPageResponseDto> getMyGathering(@PathVariable GatheringMemberStatus memberStatus,
-                                                                 @PathVariable(required = false) String made,
-                                                                 Principal principal,
-                                                                 @PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.findMyGathering(memberId, memberStatus, made,  page));
-    }
+	@GetMapping(value = {"/my/{isActive}/{made}", "/my/{isActive}"})
+	@Operation(summary = "나의 모임 가져오기", description = "내가 참여한 모임을 가져옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	@Parameter(name = "made", description = "made : [] or [me]")
+	@Parameter(name = "isActive", description = "isActive : true , false", example = "true")
+	public ResponseEntity<PageResponse<GatheringResponseDto>> getMyGathering(@PathVariable Boolean isActive,
+		@PathVariable(required = false) String made,
+		Principal principal,
+		@PageableDefault(size = 5, direction = Sort.Direction.DESC) Pageable page) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.findMyGathering(memberId, isActive, made, page));
+	}
 
-    @GetMapping(value = "/platform")
-    @Operation(summary = "AppPlatForm 가져오기", description = "AppPlatForm 가져옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<AppTechPlatformDto> getPlatform() {
-        return ResponseEntity.ok(
-                AppTechPlatformDto.builder()
-                        .appTechPlatform(AppTechPlatform.values())
-                        .build()
-        );
-    }
+	@GetMapping(value = "/platform")
+	@Operation(summary = "AppPlatForm 가져오기", description = "AppPlatForm 가져옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<AppTechPlatformDto> getPlatform() {
+		return ResponseEntity.ok(
+			AppTechPlatformDto.builder()
+				.appTechPlatform(AppTechPlatform.values())
+				.build()
+		);
+	}
 
-    @PostMapping("")
-    @Operation(summary = "모임 만들기", description = "새로운 모임을 만듭니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringMakeResponseDto> makeGathering(Principal principal,
-                                                                  @RequestBody @Valid GatheringMakeRequestDto gatheringMakeRequestDto){
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.makeGathering(memberId,gatheringMakeRequestDto));
-    }
+	@PostMapping("")
+	@Operation(summary = "모임 만들기", description = "새로운 모임을 만듭니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringMakeResponseDto> makeGathering(Principal principal,
+		@RequestBody @Valid GatheringMakeRequestDto gatheringMakeRequestDto) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.makeGathering(memberId, gatheringMakeRequestDto));
+	}
 
-    @GetMapping("/info/pending/{gatheringId}")
-    @Operation(summary = "모임 상세 정보", description = "모임 상세 정보를 가져옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<PendingGatheringResponseDto> getPendingGathering(Principal principal,
-                                                                           @PathVariable Long gatheringId
-    ){
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.findPendingGathering(gatheringId, memberId));
-    }
-    @GetMapping("/info/ongoing/{gatheringId}")
-    @Operation(summary = "모임 상세 정보", description = "모임 상세 정보를 가져옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<OngoingGatheringResponseDto> getOngoingGathering(@PathVariable Long gatheringId){
-        return ResponseEntity.ok(gatheringService.findOngoingGathering(gatheringId));
-    }
+	@GetMapping("/info/{gatheringStatus}/{gatheringId}")
+	@Operation(summary = "모임 상세 정보", description = "모임 상세 정보를 가져옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	@Parameter(name = "gatheringStatus", description = "gatheringStatus : ongoing or pending")
+	public ResponseEntity<PendingGatheringResponseDto> getPendingGathering(Principal principal,
+		@PathVariable Long gatheringId
+	) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.findPendingGathering(gatheringId, memberId));
+	}
 
-    @PutMapping("/join/{gatheringId}")
-    @Operation(summary = "모임 참가 하기", description = "현재 유저가 모임에 참가합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "인서트 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringMemberDto> joinGathering(Principal principal,
-                                                                  @PathVariable Long gatheringId){
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.joinGathering(memberId, gatheringId));
-    }
+	@GetMapping("/info/ongoing/{gatheringId}")
+	@Operation(summary = "모임 상세 정보", description = "모임 상세 정보를 가져옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<OngoingGatheringResponseDto> getOngoingGathering(@PathVariable Long gatheringId) {
+		return ResponseEntity.ok(gatheringService.findOngoingGathering(gatheringId));
+	}
 
-    @PostMapping("/left/{gatheringMemberId}")
-    @Operation(summary = "모임 나가기", description = "현재 유저가 모임에서 나갑니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "업데이트 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringMemberDto> leftGathering(Principal principal,
-                                                            @PathVariable Long gatheringMemberId){
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.leftGathering(memberId, gatheringMemberId));
-    }
+	@PutMapping("/join/{gatheringId}")
+	@Operation(summary = "모임 참가 하기", description = "현재 유저가 모임에 참가합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "인서트 성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringMemberResponseDto> joinGathering(Principal principal,
+		@PathVariable Long gatheringId) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.joinGathering(memberId, gatheringId));
+	}
 
-    @GetMapping("/saving-log/{gatheringId}")
-    @Operation(summary = "인증 현황", description = "인증된 내역을 가지고 옵니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringSavingLogResponseDto> getGatheringSavingLog(@PathVariable Long gatheringId) {
-        return ResponseEntity.ok(gatheringSavingLogService.findGatheringSavingLog(gatheringId));
-    }
+	@PostMapping("/left/{gatheringMemberId}")
+	@Operation(summary = "모임 나가기", description = "현재 유저가 모임에서 나갑니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "업데이트 성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringMemberResponseDto> leftGathering(Principal principal,
+		@PathVariable Long gatheringMemberId) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.leftGathering(memberId, gatheringMemberId));
+	}
 
-    @PutMapping(value = "/saving-log/{gatheringMemberId}", consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.MULTIPART_FORM_DATA_VALUE})
-    @Operation(summary = "인증 하기", description = "오늘 날짜로 인증을 합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "201", description = "인서트 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringSavingLogCertificateResponseDto> putGatheringSavingLog(@PathVariable Long gatheringMemberId,
-                                                                                          @RequestBody @Valid GatheringSavingLogRequestDto gatheringSavingLogRequestDto,
-                                                                                          Principal principal){
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringSavingLogService.saveGatheringSavingLog(memberId, gatheringMemberId, gatheringSavingLogRequestDto));
-    }
+	@GetMapping("/saving-log/{gatheringId}/my/{memberId}")
+	@Operation(summary = "나의 인증 현황", description = "나의 인증된 내역을 가지고 옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringMemberResponseDto> findMyGatheringSavingLog(@PathVariable Long gatheringId,
+		@PathVariable Long memberId) {
+		return ResponseEntity.ok(gatheringSavingLogService.findMyGatheringSavingLog(gatheringId, memberId));
+	}
 
-    @PostMapping("/saving-log/{savingLogId}")
-    @Operation(summary = "인증 수정 하기", description = "이전 인증을 수정 합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "수정 성공"),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringSavingLogCertificateResponseDto> modifyGatheringSavingLog(@PathVariable Long savingLogId,
-                                                                                                                             @RequestBody @Valid GatheringSavingLogRequestDto gatheringSavingLogRequestDto,
-                                                                                                                             Principal principal){
+	@GetMapping("/saving-log/{gatheringId}/other/{memberId}")
+	@Operation(summary = "다른 참가자 인증 현황", description = "다른 참가자의 인증 내역을 가지고 옵니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringOtherMemberResponseDto> findOtherMemberGatheringSavingLog(
+		@PathVariable Long gatheringId,
+		@PathVariable Long memberId) {
+		return ResponseEntity.ok(gatheringSavingLogService.findOtherMemberGatheringSavingLog(gatheringId, memberId));
+	}
 
-        Long memberId = Long.parseLong(principal.getName());
+	@PutMapping(value = "/saving-log/{gatheringMemberId}", consumes = {MediaType.APPLICATION_JSON_VALUE,
+		MediaType.MULTIPART_FORM_DATA_VALUE})
+	@Operation(summary = "인증 하기", description = "오늘 날짜로 인증을 합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "201", description = "인서트 성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringSavingLogCertificateResponseDto> putGatheringSavingLog(
+		@PathVariable Long gatheringMemberId,
+		@RequestBody @Valid GatheringSavingLogRequestDto gatheringSavingLogRequestDto,
+		Principal principal) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringSavingLogService.saveGatheringSavingLog(memberId, gatheringMemberId,
+			gatheringSavingLogRequestDto));
+	}
 
-        return ResponseEntity.ok(gatheringSavingLogService.updateGatheringSavingLog(memberId, savingLogId, gatheringSavingLogRequestDto));
-    }
+	@PostMapping("/saving-log/{savingLogId}")
+	@Operation(summary = "인증 수정 하기", description = "이전 인증을 수정 합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "수정 성공"),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringSavingLogCertificateResponseDto> modifyGatheringSavingLog(
+		@PathVariable Long savingLogId,
+		@RequestBody @Valid GatheringSavingLogRequestDto gatheringSavingLogRequestDto,
+		Principal principal) {
 
-    @GetMapping("/statistics")
-    @Operation(summary = "모임 현황 개수", description = "참가중, 완료, 내가 만든 모임 개수, 달성률을 반환합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공",
-                    content = {@Content(schema = @Schema(implementation = GatheringStatisticsResponseDto.class))}),
-            @ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
-    })
-    public ResponseEntity<GatheringStatisticsResponseDto> getGatheringStatistics(Principal principal) {
-        Long memberId = Long.parseLong(principal.getName());
-        return ResponseEntity.ok(gatheringService.gatheringStatistics(memberId));
-    }
+		Long memberId = Long.parseLong(principal.getName());
+
+		return ResponseEntity.ok(
+			gatheringSavingLogService.updateGatheringSavingLog(memberId, savingLogId, gatheringSavingLogRequestDto));
+	}
+
+	@GetMapping("/statistics")
+	@Operation(summary = "모임 현황 개수", description = "참가중, 완료, 내가 만든 모임 개수, 달성률을 반환합니다.")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "성공",
+			content = {@Content(schema = @Schema(implementation = GatheringStatisticsResponseDto.class))}),
+		@ApiResponse(responseCode = "401", description = "인증되지 않은 사용자 입니다."),
+	})
+	public ResponseEntity<GatheringStatisticsResponseDto> getGatheringStatistics(Principal principal) {
+		Long memberId = Long.parseLong(principal.getName());
+		return ResponseEntity.ok(gatheringService.gatheringStatistics(memberId));
+	}
 }

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <h1>회원 상세 정보</h1>
+            <label>
+                <button th:onclick="'window.location.href=\'' + @{/admin/member} + '\''">뒤로가기</button>
+            </label>
+            <table>
+                <caption>기본 정보
+                    <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}/profile(id=${member.id})} + '\''">수정</button>
+                </caption>
+                <thead>
+                <tr>
+                    <th>회원번호</th>
+                    <th>SNS 타입</th>
+                    <th>닉네임</th>
+                    <th>나이(년생)</th>
+                    <th>성별</th>
+                    <th>회원상태</th>
+                    <th>가입일</th>
+                </tr>
+                </thead>
+                <tbody th:if="${member != null}">
+                <tr th:each="member : ${member}">
+                    <td th:text="${member.id}">1</td>
+                    <td th:text="${member.oauthProvider}">구글</td>
+                    <td th:text="${member.nickName}">행복한 토끼</td>
+                    <td th:text="${member.birthYear}">1999</td>
+                    <td th:text="${member.sex}">선택안함</td>
+                    <td th:text="${member.isLeaved}">정상</td>
+                    <td th:text="${#temporals.format(member.createdAt,'yyyy-MM-dd HH:mm')}">2024-03-19</td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <caption>모임 현황</caption>
+                <thead>
+                <tr>
+<!--                    <th>참여중</th>-->
+                    <th>시작전</th>
+                    <th>진행중</th>
+                    <th>완료</th>
+                    <th>만든모임</th>
+                    <th>달성률</th>
+                </tr>
+                </thead>
+                <tbody th:if="${statistics != null}">
+                <tr th:object="${statistics}">
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='PENDING')}" th:text="*{pendingCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='ONGOING')}" th:text="*{onGoingCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(gatheringStatus='COMPLETED', searchCriteria='nickname',searchQuery=${member.nickName})}" th:text="*{completedCount}"/></td>
+                    <td><a th:href="@{/admin/gathering(searchCriteria='owner_nickname',searchQuery=${member.nickName})}" th:text="*{ownerGatheringCount}"/></td>
+                    <td th:text="*{achievementRate}"/>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <caption>기타</caption>
+                <thead>
+                <tr>
+                    <th>나의집</th>
+                    <th>배지</th>
+                </tr>
+                </thead>
+                <tbody th:if="${myHome != null}">
+                <tr>
+<!--                    <td th:text="${myHome}"/>-->
+<!--                    <td th:text="${badgeCount}"/>-->
+                    <td><a th:href="@{/admin/member/{id}/wallet(id=${member.id})}" th:text="${myHome}"/></td>
+                    <td><a th:href="@{/admin/member/{id}/badge(id=${member.id})}" th:text="${badgeCount}"/></td>
+                </tr>
+                </tbody>
+            </table>
+            <table>
+                <caption>이력</caption>
+                <thead>
+                <tr>
+                    <th>일시</th>
+                    <th>분류</th>
+                    <th>항목</th>
+                    <th>변경자</th>
+                    <th>변경사항</th>
+                </tr>
+                </thead>
+                <tbody th:if="${!activityLogs.isEmpty()}">
+                <tr th:each="activityLogs : ${activityLogs}">
+                    <td th:text="${#temporals.format(activityLogs.createdAt,'yyyy-MM-dd HH:mm')}"/>
+                    <td th:text="${activityLogs.activityCategory}"/>
+                    <td th:text="${activityLogs.activityType}"/>
+                    <td th:text="${activityLogs.member.nickname}"/>
+                    <td th:text="${activityLogs.description}"/>
+                </tr>
+                </tbody>
+            </table>
+            <button><a th:href="@{/admin/member/{id}/activity-log(id=${member.id})}">User Details 더보기</a></button>
+        </div>
+    </section>
+</main>
+</body>
+</html>

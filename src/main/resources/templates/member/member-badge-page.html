@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<div th:replace="~{fragments/header :: headerFragment}"></div>
+<body>
+<main>
+    <nav th:replace="~{fragments/sidebar :: sidebarFragment}"></nav>
+    <section class="content">
+
+        <div class="left-content">
+            <h1>배지 정보</h1>
+            <label>
+                <button th:onclick="'window.location.href=\'' + @{/admin/member/{id}(id=${member_id})} + '\''">뒤로가기</button>
+            </label>
+            <table>
+                <thead>
+                <tr>
+                    <th>배지명</th>
+                    <th>배지 획득 방법</th>
+                    <th>획득 여부</th>
+                    <th>상태 변경</th>
+                </tr>
+                </thead>
+                <tbody >
+                <tr th:each="badge : ${badges}">
+                    <td th:text="${badge.name()}">1</td>
+                    <td th:text="${badge.description()}">구글</td>
+                    <td th:text="${badge.isAcquired() ? 'O' : 'X'}">구글</td>
+                    <td>
+                        <form id="actionForm" method="post">
+                            <button th:if="${badge.isAcquired()}" th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/member/{id}/badge/delete/{badgeId}(id=${member_id},badgeId=${badge.id()})} + '\'' + ')'">X로 변경</button>
+                            <button th:if="${!badge.isAcquired()}" th:type="button" th:onclick="'submitFormWithAction(\'' + @{/admin/member/{id}/badge/insert/{badgeId}(id=${member_id},badgeId=${badge.id()})} + '\'' + ')'">O로 변경</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </section>
+</main>
+</body>
+</html>

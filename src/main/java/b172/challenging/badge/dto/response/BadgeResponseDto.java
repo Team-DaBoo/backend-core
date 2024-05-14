@@ -1,13 +1,23 @@
 package b172.challenging.badge.dto.response;
 
-import lombok.Builder;
+import java.time.LocalDateTime;
 
-@Builder
+import b172.challenging.badge.domain.Badge;
+
 public record BadgeResponseDto(
-        Long id,
-        String name,
-        String description,
-        String imageUrl,
-        boolean hasBadge
+	Long id,
+	String name,
+	String description,
+	String imageUrl,
+	LocalDateTime createdAt
 ) {
+	public static BadgeResponseDto from(Badge badge) {
+		return new BadgeResponseDto(
+			badge.getId(),
+			badge.getName(),
+			badge.getDescription(),
+			badge.getImageUrl(),
+			badge.getCreatedAt()
+		);
+	}
 }

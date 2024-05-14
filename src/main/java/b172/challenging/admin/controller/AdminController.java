@@ -1,0 +1,168 @@
+package b172.challenging.admin.controller;
+
+import java.util.List;
+
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import lombok.RequiredArgsConstructor;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import b172.challenging.activitylog.domain.ActivityCategory;
+import b172.challenging.activitylog.dto.ActivityLogResponseDto;
+import b172.challenging.activitylog.service.ActivityService;
+import b172.challenging.admin.dto.MemberSearchRequestDto;
+import b172.challenging.badge.service.BadgeService;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.gathering.dto.response.GatheringStatisticsResponseDto;
+import b172.challenging.gathering.service.GatheringService;
+import b172.challenging.member.domain.Member;
+import b172.challenging.member.dto.request.MemberProfileUpdateRequestDto;
+import b172.challenging.member.dto.response.MemberProfileResponseDto;
+import b172.challenging.member.service.MemberService;
+import b172.challenging.wallet.service.WalletService;
+
+@Tag(name = "Admin", description = "Admin 관련 API")
+@RequiredArgsConstructor
+@RequestMapping("/admin/member")
+@Controller
+public class AdminController {
+
+	private final MemberService memberService;
+	private final WalletService walletService;
+	private final GatheringService gatheringService;
+	private final BadgeService badgeService;
+	private final ActivityService activityService;
+
+	@GetMapping
+	public String adminPage(Model model,
+		@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+		MemberSearchRequestDto memberSearchRequestDto) {
+		pageable = pageable == null
+			? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
+			: pageable;
+
+		PageResponse<MemberProfileResponseDto> members = memberService.findAllMember(memberSearchRequestDto, pageable);
+
+		model.addAttribute("title", "회원 관리 페이지");
+		model.addAttribute("members", members);
+		model.addAttribute("condition", memberSearchRequestDto);
+
+		return "admin-page";
+	}
+
+	@GetMapping("/{memberId}")
+	public String memberPage(Model model, @PathVariable Long memberId) {
+		Member member = memberService.findMemberById(memberId);
+		String myHome = walletService.findMyWallet(memberId).myHome().name();
+		int badgeCount = badgeService.countBadgeByMemberId(memberId);
+
+		Pageable pageable = PageRequest.of(0, 5, Sort.Direction.DESC, "id");
+		PageResponse<ActivityLogResponseDto> activityLogs = activityService.findActivityLog(memberId, null, pageable);
+		List<ActivityLogResponseDto> activityLogResponseDtoList = activityLogs.list();
+		GatheringStatisticsResponseDto statistics = gatheringService.gatheringStatistics(memberId);
+
+		model.addAttribute("member", MemberProfileResponseDto.from(member));
+		model.addAttribute("statistics", statistics);
+		model.addAttribute("myHome", myHome);
+		model.addAttribute("badgeCount", badgeCount);
+		model.addAttribute("activityLogs", activityLogResponseDtoList);
+
+		return "member/member-page";
+	}
+
+	@GetMapping("/{id}/activity-log")
+	public String memberActivityPage(Model model, @PathVariable Long id,
+		@PageableDefault(size = 10, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+		@RequestParam(required = false) ActivityCategory activityCategory) {
+		pageable = pageable == null
+			? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
+			: pageable;
+
+		PageResponse<ActivityLogResponseDto> activityLogs = activityService.findActivityLog(id, activityCategory,
+			pageable);
+
+		model.addAttribute("member_id", id);
+		model.addAttribute("activity_category", ActivityCategory.values());
+		model.addAttribute("activity_curr_category", activityCategory);
+		model.addAttribute("title_activity_log", "회원 이력");
+		model.addAttribute("activityLogs", activityLogs.list());
+		model.addAttribute("pageNum", activityLogs.number());
+		model.addAttribute("totalPage", activityLogs.totalPages());
+		model.addAttribute("totalElements", activityLogs.totalElements());
+
+		return "member/member-activity-log-page";
+	}
+
+	@GetMapping("/{id}/profile")
+	public String memberProfilePage(Model model, @PathVariable Long id) {
+		Member member = memberService.findMemberById(id);
+		model.addAttribute("member_id", id);
+		model.addAttribute("member", MemberProfileResponseDto.from(member));
+		return "member/member-profile-page";
+	}
+
+	@PostMapping("/{id}/profile")
+	public String memberProfileUpdate(Model model, @PathVariable Long id,
+		MemberProfileUpdateRequestDto memberProfileUpdateRequestDto) {
+		memberService.updateMemberProfile(id, memberProfileUpdateRequestDto);
+		Member member = memberService.findMemberById(id);
+		model.addAttribute("title_modify_member", "회원 정보 수정");
+		model.addAttribute("member_id", id);
+		model.addAttribute("member", MemberProfileResponseDto.from(member));
+		return "member/member-profile-page";
+	}
+
+	@GetMapping("/{id}/badge")
+	public String badgePage(Model model, @PathVariable Long id) {
+		model.addAttribute("badges", badgeService.findMemberBadgeList(id));
+		model.addAttribute("member_id", id);
+
+		return "member/member-badge-page";
+	}
+
+	@PostMapping("/{id}/badge/insert/{badgeId}")
+	public String badgeInsert(@PathVariable Long id,
+		@PathVariable Long badgeId) {
+		badgeService.insertMemberBadge(id, badgeId);
+		return "redirect:/admin/member/" + id + "/badge";
+	}
+
+	@PostMapping("/{id}/badge/delete/{badgeId}")
+	public String badgeDelete(@PathVariable Long id,
+		@PathVariable Long badgeId) {
+		badgeService.deleteMemberBadge(id, badgeId);
+		return "redirect:/admin/member/" + id + "/badge";
+	}
+
+	@GetMapping("{id}/wallet")
+	public String myHomePage(Model model, @PathVariable Long id) {
+		model.addAttribute("wallet", walletService.findMyWallet(id));
+		model.addAttribute("materialList", walletService.findMyMaterialWallet(id));
+		model.addAttribute("member_id", id);
+		return "member/member-wallet-page";
+	}
+
+	@PostMapping("/{id}/wallet/update/{walletId}")
+	public String updateMyHome(@PathVariable Long id, @PathVariable Long walletId, Long amount) {
+		walletService.updateWallet(walletId, amount);
+		return "redirect:/admin/member/" + id + "/wallet";
+	}
+
+	@PostMapping("/{id}/material/update/{materialWalletId}")
+	public String updateHomeMaterial(@PathVariable Long id, @PathVariable Long materialWalletId, Long amount) {
+		walletService.updateHomeMaterial(materialWalletId, amount);
+		return "redirect:/admin/member/" + id + "/wallet";
+	}
+
+}

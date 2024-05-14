@@ -1,0 +1,12 @@
+INSERT INTO badge (id, name, description, image) VALUES (1, '모임 수집가', '모든 앱 테크 앱 별로 모임을 1개씩 완료해주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (2, '인증 홀릭', '달성률 80이상인 모임을 만들어주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (3, '내집마련의 첫걸음', '나의 집을 오두막으로 만들어주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (4, '내집마련의 달인', '나의 집을 초가집으로 만들어주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (5, '인증의 달인', '달성률 80이상인 모임 5개를 만들어주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (6, '갓벽의 첫걸음', '달성률 100인 모임을 만들어주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (7, '갓벽한 당신', '달성률 100인 모임 5개를 만들어 주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (8, '부자되는 습관', '달성률 100인 모임 10개를 만들어 주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (9, '모임의 재미', '모든 앱테크 앱 별로 모임을 5개씩 완료해주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (10, '모임 탐험가', '모든 앱테크 앱 별로 모임을 10개씩 완료해주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (11, '모임의 달인', '모든 앱테크 앱 별로 모임을 30개씩 완료해주세요.', '');
+INSERT INTO badge (id, name, description, image) VALUES (12, '모으기의 시작', '모임을 만든 뒤 모집인원을 채워주세요.', '');

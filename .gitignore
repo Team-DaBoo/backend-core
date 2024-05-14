@@ -40,4 +40,4 @@ out/
 **/application-security.yml
 
 ### QEntity
-**/src/generated/
+**/generated/

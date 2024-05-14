@@ -4,8 +4,10 @@ import lombok.Builder;
 
 @Builder
 public record RankingResponseDto(
-        Long totalAmount,
-        Long memberId,
-        String nickname,
-        String homeImageUrl
-) { }
+	Long rank,
+	Long memberId,
+	String nickname,
+	Long totalAmount,
+	Long homeLevel
+) {
+}
