@@ -4,10 +4,10 @@ import b172.challenging.common.domain.UseYn;
 import b172.challenging.protip.domain.ProTipType;
 
 public record ProTipSearchRequestDto(
-        ProTipType proTipType,
+	ProTipType proTipType,
 
-        UseYn useYn,
-        String searchCriteria,
-        String searchQuery
+	UseYn useYn,
+	String searchCriteria,
+	String searchQuery
 ) {
 }

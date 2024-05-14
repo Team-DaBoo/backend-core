@@ -5,10 +5,10 @@ import lombok.Getter;
 @Getter
 public class CustomRuntimeException extends RuntimeException {
 
-    private final Exceptions exceptions;
+	private final Exceptions exceptions;
 
-    public CustomRuntimeException(Exceptions exceptions) {
-        super(exceptions.getMessage());
-        this.exceptions = exceptions;
-    }
+	public CustomRuntimeException(Exceptions exceptions) {
+		super(exceptions.getMessage());
+		this.exceptions = exceptions;
+	}
 }

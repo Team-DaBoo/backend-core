@@ -1,14 +1,7 @@
 package b172.challenging.admin.controller;
 
-import b172.challenging.announcements.Announcements;
-import b172.challenging.announcements.AnnouncementsRequestDto;
-import b172.challenging.announcements.AnnouncementsResponseDto;
-import b172.challenging.announcements.AnnouncementsService;
-import b172.challenging.common.dto.PageResponse;
-import b172.challenging.common.dto.SearchRequestDto;
-import b172.challenging.member.domain.Role;
-import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
+import java.security.Principal;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,7 +13,17 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.security.Principal;
+import lombok.RequiredArgsConstructor;
+
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+import b172.challenging.announcements.Announcements;
+import b172.challenging.announcements.AnnouncementsRequestDto;
+import b172.challenging.announcements.AnnouncementsResponseDto;
+import b172.challenging.announcements.AnnouncementsService;
+import b172.challenging.common.dto.PageResponse;
+import b172.challenging.common.dto.SearchRequestDto;
+import b172.challenging.member.domain.Role;
 
 @Tag(name = "Admin Announcements", description = "Admin 공지사항 관련 API")
 @RequiredArgsConstructor
@@ -28,69 +31,71 @@ import java.security.Principal;
 @Controller
 public class AdminAnnouncementsController {
 
-    private final AnnouncementsService announcementsService;
-    @GetMapping
-    public String adminAnnouncementsPage(Model model,
-                                         @PageableDefault(size = 5,sort = "id",direction = Sort.Direction.DESC) Pageable pageable,
-                                         SearchRequestDto searchRequestDto) {
-        pageable = pageable == null
-                ? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
-                : pageable;
+	private final AnnouncementsService announcementsService;
 
-        PageResponse<AnnouncementsResponseDto> announcements = announcementsService.findAllAnnouncements(Role.ADMIN,searchRequestDto, pageable);
+	@GetMapping
+	public String adminAnnouncementsPage(Model model,
+		@PageableDefault(size = 5, sort = "id", direction = Sort.Direction.DESC) Pageable pageable,
+		SearchRequestDto searchRequestDto) {
+		pageable = pageable == null
+			? PageRequest.of(0, 5, Sort.Direction.DESC, "id")
+			: pageable;
 
-        model.addAttribute("announcements" , announcements);
-        model.addAttribute("condition",searchRequestDto);
+		PageResponse<AnnouncementsResponseDto> announcements = announcementsService.findAllAnnouncements(Role.ADMIN,
+			searchRequestDto, pageable);
 
-        return "announcements/announcements-page";
-    }
+		model.addAttribute("announcements", announcements);
+		model.addAttribute("condition", searchRequestDto);
 
-    @GetMapping("/{id}")
-    public String adminAnnouncementsPage(Model model,
-                                  @PathVariable Long id){
-        Announcements announcements = announcementsService.findAnnouncementsById(id);
+		return "announcements/announcements-page";
+	}
 
-        model.addAttribute("announcements" , announcements);
+	@GetMapping("/{id}")
+	public String adminAnnouncementsPage(Model model,
+		@PathVariable Long id) {
+		Announcements announcements = announcementsService.findAnnouncementsById(id);
 
-        return "announcements/announcements-detail-page";
-    }
+		model.addAttribute("announcements", announcements);
 
-    @GetMapping("/create")
-    public String proTipCreatePage() {
-        return "announcements/announcements-create-page";
-    }
+		return "announcements/announcements-detail-page";
+	}
 
-    @PostMapping("/create")
-    public String announcementCreatePage(AnnouncementsRequestDto announcementsRequestDto,
-                                         Principal principal) {
-        Long memberId = Long.parseLong(principal.getName());
-        announcementsService.createAnnouncements(memberId, announcementsRequestDto);
-        return "redirect:/admin/announcements";
-    }
+	@GetMapping("/create")
+	public String proTipCreatePage() {
+		return "announcements/announcements-create-page";
+	}
 
-    @GetMapping("/update/{id}")
-    public String announcementUpdatePage(Model model,
-                                         @PathVariable Long id) {
-        Announcements announcements = announcementsService.findAnnouncementsById(id);
+	@PostMapping("/create")
+	public String announcementCreatePage(AnnouncementsRequestDto announcementsRequestDto,
+		Principal principal) {
+		Long memberId = Long.parseLong(principal.getName());
+		announcementsService.createAnnouncements(memberId, announcementsRequestDto);
+		return "redirect:/admin/announcements";
+	}
 
-        model.addAttribute("announcements" , announcements);
+	@GetMapping("/update/{id}")
+	public String announcementUpdatePage(Model model,
+		@PathVariable Long id) {
+		Announcements announcements = announcementsService.findAnnouncementsById(id);
 
-        return "announcements/announcements-update-page";
-    }
+		model.addAttribute("announcements", announcements);
 
-    @PostMapping("/update/{id}")
-    public String proTipUpdate(@PathVariable Long id,
-                               AnnouncementsRequestDto announcementsRequestDto,
-                               Principal principal) {
-        Long memberId = Long.parseLong(principal.getName());
+		return "announcements/announcements-update-page";
+	}
 
-        announcementsService.updateAnnouncements(id, memberId, announcementsRequestDto);
-        return "redirect:/admin/announcements/" + id;
-    }
+	@PostMapping("/update/{id}")
+	public String proTipUpdate(@PathVariable Long id,
+		AnnouncementsRequestDto announcementsRequestDto,
+		Principal principal) {
+		Long memberId = Long.parseLong(principal.getName());
 
-    @PostMapping("/delete/{id}")
-    public String announcementDeletePage(@PathVariable Long id) {
-        announcementsService.deleteAnnouncement(id);
-        return "redirect:/admin/announcements";
-    }
+		announcementsService.updateAnnouncements(id, memberId, announcementsRequestDto);
+		return "redirect:/admin/announcements/" + id;
+	}
+
+	@PostMapping("/delete/{id}")
+	public String announcementDeletePage(@PathVariable Long id) {
+		announcementsService.deleteAnnouncement(id);
+		return "redirect:/admin/announcements";
+	}
 }

@@ -1,9 +1,11 @@
 package b172.challenging.protip.dto;
 
-import b172.challenging.protip.domain.ProTip;
 import lombok.Builder;
 
+import b172.challenging.protip.domain.ProTip;
+
 @Builder
-public record ProTipEditResponseDto (
-        ProTip proTip
-) { }
+public record ProTipEditResponseDto(
+	ProTip proTip
+) {
+}

@@ -1,84 +1,97 @@
 package b172.challenging.member.domain;
 
-import b172.challenging.common.domain.BaseTimeEntity;
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import b172.challenging.common.domain.BaseTimeEntity;
+
 @Entity
 @Getter
 @Table(name = "member", uniqueConstraints = {
-        @UniqueConstraint(columnNames = {"oauth_provider", "oauth_id"})
+	@UniqueConstraint(columnNames = {"oauth_provider", "oauth_id"})
 })
 @NoArgsConstructor
 public class Member extends BaseTimeEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "member_id")
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "member_id")
+	private Long id;
 
-    @Column(name = "oauth_provider", nullable = false, length = 10)
-    @Enumerated(EnumType.STRING)
-    private OauthProvider oauthProvider;
+	@Column(name = "oauth_provider", nullable = false, length = 10)
+	@Enumerated(EnumType.STRING)
+	private OauthProvider oauthProvider;
 
-    @Column(name = "oauth_id", nullable = false, length = 128)
-    private String oauthId;
+	@Column(name = "oauth_id", nullable = false, length = 128)
+	private String oauthId;
 
-    @Column(nullable = false, length = 30, unique = true)
-    private String nickname;
+	@Column(nullable = false, length = 30, unique = true)
+	private String nickname;
 
-    @Column(length = 30)
-    private String jwtCode;
+	@Column(length = 30)
+	private String jwtCode;
 
-    @Column(nullable = false, length = 30)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+	@Column(nullable = false, length = 30)
+	@Enumerated(EnumType.STRING)
+	private Role role;
 
-    @Column(name = "is_leaved", nullable = false)
-    private boolean isLeaved;
+	@Column(name = "is_leaved", nullable = false)
+	private boolean isLeaved;
 
-    @Column(name = "birth_year")
-    private Long birthYear;
+	@Column(name = "birth_year")
+	private Long birthYear;
 
-    @Column(length = 10)
-    @Enumerated(EnumType.STRING)
-    private Sex sex;
-    @Builder
-    public Member(Long id, OauthProvider oauthProvider, String oauthId, String nickname) {
-        this.id = id;
-        this.oauthProvider = oauthProvider;
-        this.oauthId = oauthId;
-        this.nickname = nickname;
-        this.role = Role.GUEST;
-        this.isLeaved = false;
-        this.sex = Sex.NONE;
-    }
+	@Column(length = 10)
+	@Enumerated(EnumType.STRING)
+	private Sex sex;
 
-    public Member(Long memberId){
-        this.id = memberId;
-    }
+	@Builder
+	public Member(Long id, OauthProvider oauthProvider, String oauthId, String nickname) {
+		this.id = id;
+		this.oauthProvider = oauthProvider;
+		this.oauthId = oauthId;
+		this.nickname = nickname;
+		this.role = Role.GUEST;
+		this.isLeaved = false;
+		this.sex = Sex.NONE;
+	}
 
-    public void setJwtCode(String jwtCode) {
-        this.jwtCode = jwtCode;
-    }
+	public Member(Long memberId) {
+		this.id = memberId;
+	}
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
+	public void setJwtCode(String jwtCode) {
+		this.jwtCode = jwtCode;
+	}
 
-    public void setBirthYear(Long birthYear) {
-        this.birthYear = birthYear;
-    }
+	public void setNickname(String nickname) {
+		this.nickname = nickname;
+	}
 
-    public void setSex(Sex sex) {
-        this.sex = sex;
-    }
-    public void setRole(Role role) {
-        this.role = role;
-    }
+	public void setBirthYear(Long birthYear) {
+		this.birthYear = birthYear;
+	}
 
-    public boolean isNicknameChanged(String inputNickname) {
-        return !nickname.equals(inputNickname);
-    }
+	public void setSex(Sex sex) {
+		this.sex = sex;
+	}
+
+	public void setRole(Role role) {
+		this.role = role;
+	}
+
+	public boolean isNicknameChanged(String inputNickname) {
+		return !nickname.equals(inputNickname);
+	}
 }

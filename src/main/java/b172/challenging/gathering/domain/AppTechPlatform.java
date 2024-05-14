@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum AppTechPlatform {
-    TOSS("토스"),
-    CASH_WALK("캐시워크"),
-    MONIMO("모니모"),
-    BALSO("발로소득");
+	TOSS("토스"),
+	CASH_WALK("캐시워크"),
+	MONIMO("모니모"),
+	BALSO("발로소득");
 
-    private final String key;
+	private final String key;
 }

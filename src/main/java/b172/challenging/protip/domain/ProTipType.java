@@ -6,10 +6,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Getter
 public enum ProTipType {
-    YOUTUBE("유튜브"),
-    BLOG("블로그"),
-    APP("앱");
+	YOUTUBE("유튜브"),
+	BLOG("블로그"),
+	APP("앱");
 
-    private final String key;
+	private final String key;
 
 }

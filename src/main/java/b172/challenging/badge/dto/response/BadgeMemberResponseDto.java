@@ -4,16 +4,15 @@ import b172.challenging.badge.domain.BadgeMember;
 
 public record BadgeMemberResponseDto(
 
-        Long memberId,
+	Long memberId,
 
-
-        BadgeResponseDto badge
+	BadgeResponseDto badge
 
 ) {
-    public static BadgeMemberResponseDto from(BadgeMember badgeMember){
-        return new BadgeMemberResponseDto(
-                badgeMember.getId(),
-                BadgeResponseDto.from(badgeMember.getBadge())
-        );
-    }
+	public static BadgeMemberResponseDto from(BadgeMember badgeMember) {
+		return new BadgeMemberResponseDto(
+			badgeMember.getId(),
+			BadgeResponseDto.from(badgeMember.getBadge())
+		);
+	}
 }
