@@ -10,7 +10,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Lob;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
@@ -52,9 +51,8 @@ public class ProTip extends BaseTimeEntity {
 	@Schema(description = "제목")
 	private String title;
 
-	@Column
+	@Column(columnDefinition = "longtext")
 	@Schema(description = "내용")
-	@Lob
 	private String content;
 
 	@Column(name = "img_url")
