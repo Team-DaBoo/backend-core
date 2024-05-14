@@ -1,14 +1,15 @@
 package b172.challenging;
 
-import b172.challenging.gathering.controller.GatheringController;
-import b172.challenging.gathering.domain.AppTechPlatform;
+import java.util.Arrays;
+import java.util.Objects;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.Arrays;
-import java.util.Objects;
+import b172.challenging.gathering.controller.GatheringController;
+import b172.challenging.gathering.domain.AppTechPlatform;
 
 @SpringBootTest
 class ChallengingApplicationTests {
@@ -25,7 +26,8 @@ class ChallengingApplicationTests {
 	@DisplayName("gathering processing")
 	@Test
 	void 동작_테스트() {
-		assert Arrays.equals(Objects.requireNonNull(gatheringController.getPlatform().getBody()).appTechPlatform(), AppTechPlatform.values());
+		assert Arrays.equals(Objects.requireNonNull(gatheringController.getPlatform().getBody()).appTechPlatform(),
+			AppTechPlatform.values());
 	}
 
 }
