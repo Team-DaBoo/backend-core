@@ -1,0 +1,11 @@
+resources:
+- deployment.yml
+- ingress.yml
+- service.yml
+
+namespace: api
+
+namePrefix: dev-
+
+commonLabels:
+  app: api-server
